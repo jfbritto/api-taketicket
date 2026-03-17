@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Web\Dashboard;
 
 use App\DTO\CreateEventDTO;
 use App\Http\Controllers\Controller;
+use App\Models\CustomField;
 use App\Models\Event;
 use App\Models\TicketType;
-use App\Models\CustomField;
 use App\Services\EventService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -110,7 +110,7 @@ class DashboardEventController extends Controller
         // Sync ticket types
         $existingIds = [];
         foreach ($validated['ticket_types'] ?? [] as $ttData) {
-            if (!empty($ttData['id'])) {
+            if (! empty($ttData['id'])) {
                 $tt = TicketType::findOrFail($ttData['id']);
                 $tt->update([
                     'name' => $ttData['name'],
@@ -142,13 +142,13 @@ class DashboardEventController extends Controller
         // Sync custom fields
         $existingFieldIds = [];
         foreach ($validated['custom_fields'] ?? [] as $index => $cfData) {
-            if (!empty($cfData['id'])) {
+            if (! empty($cfData['id'])) {
                 $cf = CustomField::findOrFail($cfData['id']);
                 $cf->update([
                     'label' => $cfData['label'],
                     'type' => $cfData['type'],
                     'required' => $cfData['required'] ?? false,
-                    'options' => $cfData['type'] === 'select' && !empty($cfData['options'])
+                    'options' => $cfData['type'] === 'select' && ! empty($cfData['options'])
                         ? array_map('trim', explode(',', $cfData['options']))
                         : null,
                     'position' => $cfData['position'] ?? $index,
@@ -160,7 +160,7 @@ class DashboardEventController extends Controller
                     'label' => $cfData['label'],
                     'type' => $cfData['type'],
                     'required' => $cfData['required'] ?? false,
-                    'options' => $cfData['type'] === 'select' && !empty($cfData['options'])
+                    'options' => $cfData['type'] === 'select' && ! empty($cfData['options'])
                         ? array_map('trim', explode(',', $cfData['options']))
                         : null,
                     'position' => $cfData['position'] ?? $index,
@@ -181,6 +181,7 @@ class DashboardEventController extends Controller
 
         try {
             $this->eventService->publishEvent($event);
+
             return redirect()->back()->with('success', 'Event published!');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -193,6 +194,7 @@ class DashboardEventController extends Controller
 
         try {
             $this->eventService->cancelEvent($event);
+
             return redirect()->back()->with('success', 'Event cancelled.');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', $e->getMessage());

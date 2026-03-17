@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Order;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -28,7 +29,7 @@ class OrderController extends Controller
         abort_if($order->event_id !== $event->id, 404);
 
         $order->load('user', 'items.ticketType', 'payment');
-        $tickets = \App\Models\Ticket::whereIn('order_item_id', $order->items->pluck('id'))
+        $tickets = Ticket::whereIn('order_item_id', $order->items->pluck('id'))
             ->with('participant')
             ->get();
 

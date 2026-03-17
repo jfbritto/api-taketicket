@@ -8,6 +8,7 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Order;
+use App\Models\ParticipantFieldValue;
 use App\Models\Ticket;
 use App\Services\OrderService;
 use App\Services\PaymentService;
@@ -32,7 +33,9 @@ class CheckoutController extends Controller
         // Build items with placeholder participants (will be filled in checkout form)
         $items = [];
         foreach ($validated['items'] as $item) {
-            if ($item['quantity'] < 1) continue;
+            if ($item['quantity'] < 1) {
+                continue;
+            }
             $participants = [];
             for ($i = 0; $i < $item['quantity']; $i++) {
                 $participants[] = ['name' => 'Pending', 'email' => 'pending@pending.com'];
@@ -55,6 +58,7 @@ class CheckoutController extends Controller
                 items: $items,
             );
             $order = $orderService->createOrder($request->user(), $dto);
+
             return redirect()->route('checkout.show', $order);
         } catch (\Throwable $e) {
             return back()->with('error', $e->getMessage());
@@ -107,9 +111,9 @@ class CheckoutController extends Controller
                     'document' => $data['document'] ?? null,
                 ]);
             }
-            if (!empty($data['custom_fields'])) {
+            if (! empty($data['custom_fields'])) {
                 foreach ($data['custom_fields'] as $fieldId => $value) {
-                    \App\Models\ParticipantFieldValue::updateOrCreate(
+                    ParticipantFieldValue::updateOrCreate(
                         ['participant_id' => $ticket->participant->id, 'custom_field_id' => $fieldId],
                         ['value' => $value]
                     );
@@ -154,7 +158,7 @@ class CheckoutController extends Controller
         $billingType = BillingType::from($validated['billing_type']);
 
         $payment = $order->payment;
-        if (!$payment) {
+        if (! $payment) {
             $payment = $paymentService->createPayment($order, $billingType);
             $order->update(['status' => OrderStatus::AWAITING_PAYMENT]);
         }
@@ -162,6 +166,7 @@ class CheckoutController extends Controller
         if ($billingType === BillingType::PIX) {
             $pixData = $paymentService->getPixQrCode($payment);
             $order->load('event', 'items.ticketType');
+
             return view('checkout.payment', compact('order', 'pixData'));
         }
 

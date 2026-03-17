@@ -45,7 +45,7 @@ class PublicPagesTest extends TestCase
             'sale_end' => now()->addMonth(),
         ]);
 
-        $response = $this->get('/event/' . $event->slug);
+        $response = $this->get('/event/'.$event->slug);
 
         $response->assertOk();
         $response->assertSee('Concert Night');
@@ -57,7 +57,7 @@ class PublicPagesTest extends TestCase
     {
         $event = Event::factory()->create(['status' => EventStatus::DRAFT]);
 
-        $response = $this->get('/event/' . $event->slug);
+        $response = $this->get('/event/'.$event->slug);
 
         $response->assertNotFound();
     }

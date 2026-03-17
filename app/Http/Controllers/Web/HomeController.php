@@ -18,11 +18,11 @@ class HomeController extends Controller
             ->orderBy('start_date');
 
         if ($request->filled('city')) {
-            $query->where('city', 'like', '%' . $request->city . '%');
+            $query->where('city', 'like', '%'.$request->city.'%');
         }
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('date_from')) {

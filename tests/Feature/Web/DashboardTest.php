@@ -7,8 +7,10 @@ use App\Enums\OrderStatus;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\Organizer;
+use App\Models\TicketType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -123,7 +125,7 @@ class DashboardTest extends TestCase
         $organizer = Organizer::factory()->create();
         $event = Event::factory()->create(['organizer_id' => $organizer->id]);
 
-        $response = $this->actingAs($organizer->user)->put('/dashboard/events/' . $event->id, [
+        $response = $this->actingAs($organizer->user)->put('/dashboard/events/'.$event->id, [
             'title' => 'Updated Title',
             'start_date' => now()->addMonth()->format('Y-m-d\TH:i'),
         ]);
@@ -136,10 +138,10 @@ class DashboardTest extends TestCase
     {
         $organizer = Organizer::factory()->create();
         $event = Event::factory()->create(['organizer_id' => $organizer->id, 'status' => EventStatus::DRAFT]);
-        \App\Models\TicketType::factory()->create(['event_id' => $event->id]);
-        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response(['id' => 'acc_123'])]);
+        TicketType::factory()->create(['event_id' => $event->id]);
+        Http::fake(['*' => Http::response(['id' => 'acc_123'])]);
 
-        $response = $this->actingAs($organizer->user)->patch('/dashboard/events/' . $event->id . '/publish');
+        $response = $this->actingAs($organizer->user)->patch('/dashboard/events/'.$event->id.'/publish');
 
         $response->assertRedirect();
         $this->assertEquals(EventStatus::PUBLISHED, $event->fresh()->status);
@@ -151,7 +153,7 @@ class DashboardTest extends TestCase
         $organizer2 = Organizer::factory()->create();
         $event = Event::factory()->create(['organizer_id' => $organizer1->id]);
 
-        $response = $this->actingAs($organizer2->user)->get('/dashboard/events/' . $event->id . '/edit');
+        $response = $this->actingAs($organizer2->user)->get('/dashboard/events/'.$event->id.'/edit');
 
         $response->assertForbidden();
     }

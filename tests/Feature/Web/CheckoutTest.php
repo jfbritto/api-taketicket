@@ -38,6 +38,7 @@ class CheckoutTest extends TestCase
             'sale_start' => now()->subDay(),
             'sale_end' => now()->addMonth(),
         ]);
+
         return [$event, $ticketType];
     }
 

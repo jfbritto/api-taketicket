@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Web\Dashboard;
 use App\Enums\EventStatus;
 use App\Enums\TicketStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Event;
+use App\Models\Ticket;
 use App\Services\CheckinService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,11 +38,11 @@ class CheckinController extends Controller
 
         // Verify ticket belongs to organizer's events before check-in
         $organizer = $request->user()->organizer;
-        $ticket = \App\Models\Ticket::where('ticket_code', $isQr ? null : $input)
+        $ticket = Ticket::where('ticket_code', $isQr ? null : $input)
             ->orWhere('qr_code_payload', $isQr ? $input : null)
             ->first();
 
-        if ($ticket && !$organizer->events()->where('id', $ticket->event_id)->exists()) {
+        if ($ticket && ! $organizer->events()->where('id', $ticket->event_id)->exists()) {
             return response()->json(['status' => 'unauthorized', 'message' => 'This ticket does not belong to your events.'], 403);
         }
 
@@ -65,9 +65,9 @@ class CheckinController extends Controller
 
         // Verify ticket belongs to organizer's events before undo
         $organizer = $request->user()->organizer;
-        $ticket = \App\Models\Ticket::where('ticket_code', $validated['ticket_code'])->first();
+        $ticket = Ticket::where('ticket_code', $validated['ticket_code'])->first();
 
-        if ($ticket && !$organizer->events()->where('id', $ticket->event_id)->exists()) {
+        if ($ticket && ! $organizer->events()->where('id', $ticket->event_id)->exists()) {
             return response()->json(['status' => 'unauthorized', 'message' => 'This ticket does not belong to your events.'], 403);
         }
 

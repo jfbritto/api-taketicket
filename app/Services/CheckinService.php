@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\TicketStatus;
 use App\Models\Checkin;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class CheckinService
 {
@@ -72,7 +73,7 @@ class CheckinService
         $ticket->checkins()->latest('checked_at')->first()?->delete();
 
         // Log the undo action for audit trail
-        \Illuminate\Support\Facades\Log::info('Check-in undone', [
+        Log::info('Check-in undone', [
             'ticket_id' => $ticket->id,
             'ticket_code' => $ticket->ticket_code,
             'undone_by' => $user->id,

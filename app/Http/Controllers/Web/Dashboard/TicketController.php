@@ -16,7 +16,7 @@ class TicketController extends Controller
         $query = $event->tickets()->with('participant', 'ticketType');
 
         if ($request->filled('search')) {
-            $query->where('ticket_code', 'like', '%' . $request->search . '%');
+            $query->where('ticket_code', 'like', '%'.$request->search.'%');
         }
 
         $tickets = $query->paginate(15);

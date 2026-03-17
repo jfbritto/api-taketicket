@@ -6,12 +6,12 @@ use App\Enums\EventStatus;
 use App\Enums\TicketStatus;
 use App\Models\Checkin;
 use App\Models\Event;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Organizer;
+use App\Models\Participant;
 use App\Models\Ticket;
 use App\Models\TicketType;
-use App\Models\OrderItem;
-use App\Models\Order;
-use App\Models\Participant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

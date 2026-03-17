@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Participant;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ParticipantController extends Controller
 {
@@ -22,8 +22,8 @@ class ParticipantController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('document', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('document', 'like', "%{$search}%");
             });
         }
 
@@ -43,8 +43,8 @@ class ParticipantController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('document', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('document', 'like', "%{$search}%");
             });
         }
 
