@@ -134,11 +134,12 @@ GET /checkout/{order}/status     → JSON endpoint for PIX polling
 - Custom fields ordered by `position`
 - Order summary sidebar: event name, ticket types x quantities, total price
 - Countdown timer showing order expiration (Alpine.js)
+- **Expired order handling**: if the order has expired when loading any checkout page, redirect to the event page with a flash message ("Order expired. Please try again.")
 - **Pricing display**: only show total ticket price to the customer — platform fee is not visible (deducted from organizer side)
 
 ### Payment Page (`/checkout/{order}/payment`)
 
-- Payment method selection: PIX or Credit Card
+- Payment method selection: PIX or Credit Card (submitted as `billing_type` field matching the `BillingType` enum)
 - **PIX flow:**
   - Creates Asaas charge via `PaymentService::createPayment()`
   - Displays QR code image + copy-paste code from `PaymentService::getPixQrCode()`
@@ -284,7 +285,7 @@ Save → creates as draft, redirects to events list.
   - Red: invalid ticket
   - Yellow: already used + timestamp of previous check-in
 - Running stats: checked-in / total tickets for selected event
-- **Undo check-in** button: reverts a ticket from USED back to VALID, deletes the checkin record
+- **Undo check-in** button: reverts a ticket from USED back to VALID, deletes the checkin record (requires new `CheckinService::undoCheckin()` method)
 
 ### Check-in Routes
 
