@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\Dashboard\DashboardController;
 use App\Http\Controllers\Web\Dashboard\FinancialController;
 use App\Http\Controllers\Web\Dashboard\DashboardEventController;
 use App\Http\Controllers\Web\Dashboard\OrderController as DashboardOrderController;
+use App\Http\Controllers\Web\Dashboard\GlobalParticipantController;
 use App\Http\Controllers\Web\Dashboard\ParticipantController;
 use App\Http\Controllers\Web\Dashboard\SettingsController;
 use App\Http\Controllers\Web\Dashboard\TicketController as DashboardTicketController;
@@ -74,6 +75,10 @@ Route::middleware('auth')->group(function () {
 
         // Financial
         Route::get('financeiro', [FinancialController::class, 'index'])->name('dashboard.financeiro');
+
+        // Global Participants
+        Route::get('participantes', [GlobalParticipantController::class, 'index'])->name('dashboard.participantes');
+        Route::get('participantes/export', [GlobalParticipantController::class, 'export'])->name('dashboard.participantes.export');
 
         // Settings
         Route::get('settings', [SettingsController::class, 'index'])->name('dashboard.settings');
