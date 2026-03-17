@@ -4,6 +4,7 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\CheckoutController;
 use App\Http\Controllers\Web\Dashboard\CheckinController;
 use App\Http\Controllers\Web\Dashboard\DashboardController;
+use App\Http\Controllers\Web\Dashboard\FinancialController;
 use App\Http\Controllers\Web\Dashboard\DashboardEventController;
 use App\Http\Controllers\Web\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Web\Dashboard\ParticipantController;
@@ -70,6 +71,9 @@ Route::middleware('auth')->group(function () {
         Route::get('checkin', [CheckinController::class, 'index'])->name('dashboard.checkin');
         Route::post('checkin/validate', [CheckinController::class, 'validateTicket'])->name('dashboard.checkin.validate');
         Route::post('checkin/undo', [CheckinController::class, 'undo'])->name('dashboard.checkin.undo');
+
+        // Financial
+        Route::get('financeiro', [FinancialController::class, 'index'])->name('dashboard.financeiro');
 
         // Settings
         Route::get('settings', [SettingsController::class, 'index'])->name('dashboard.settings');
