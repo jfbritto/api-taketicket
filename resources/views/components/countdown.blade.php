@@ -24,7 +24,8 @@ function countdown(expiresAt) {
                 if (diff <= 0) {
                     this.expired = true;
                     this.display = '00:00';
-                    window.location.href = window.location.href;
+                    // Dispatch event so the page can handle expiry (e.g., redirect to event page)
+                    window.dispatchEvent(new CustomEvent('order-expired'));
                     return;
                 }
                 const mins = Math.floor(diff / 60000);
