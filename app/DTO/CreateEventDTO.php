@@ -19,13 +19,13 @@ class CreateEventDTO
     public static function fromRequest(array $data): self
     {
         return new self(
-            title: $data['title'],
+            title: $data['title'] ?? '',
             description: $data['description'] ?? null,
             location: $data['location'] ?? null,
             address: $data['address'] ?? null,
             city: $data['city'] ?? null,
             state: $data['state'] ?? null,
-            startDate: $data['start_date'],
+            startDate: $data['start_date'] ?? '',
             endDate: $data['end_date'] ?? null,
             banner: $data['banner'] ?? null,
         );
