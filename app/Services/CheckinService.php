@@ -50,4 +50,35 @@ class CheckinService
             'participant' => $ticket->participant,
         ];
     }
+
+    public function undoCheckin(string $ticketCode, User $user): array
+    {
+        $ticket = $this->ticketService->validateTicket($ticketCode);
+
+        if (! $ticket) {
+            return ['status' => 'invalid'];
+        }
+
+        if ($ticket->status !== TicketStatus::USED) {
+            return ['status' => 'not_checked_in'];
+        }
+
+        $ticket->update([
+            'status' => TicketStatus::VALID,
+            'checked_in_at' => null,
+        ]);
+
+        // Delete the most recent checkin record
+        $ticket->checkins()->latest('checked_at')->first()?->delete();
+
+        // Log the undo action for audit trail
+        \Illuminate\Support\Facades\Log::info('Check-in undone', [
+            'ticket_id' => $ticket->id,
+            'ticket_code' => $ticket->ticket_code,
+            'undone_by' => $user->id,
+            'undone_at' => now()->toIso8601String(),
+        ]);
+
+        return ['status' => 'undone'];
+    }
 }
