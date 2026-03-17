@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Web\PublicEventController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('event/{slug}', [PublicEventController::class, 'show'])->name('event.show');
 
 // Auth routes
 Route::middleware('guest')->group(function () {
