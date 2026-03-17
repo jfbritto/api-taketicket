@@ -1,74 +1,82 @@
 <x-layouts.dashboard :header="$event->title">
-    <div class="space-y-6">
+    <div class="space-y-5">
 
-        {{-- Header --}}
-        <div class="flex items-start justify-between">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('dashboard.events') }}" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                </a>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900">{{ $event->title }}</h1>
-                    <p class="text-sm text-gray-500">
-                        {{ $event->city }}{{ $event->city && $event->state ? ', ' : '' }}{{ $event->state }}
-                        @if($event->city || $event->state) · @endif
-                        {{ $event->start_date->format('d/m/Y H:i') }}
-                    </p>
+        {{-- Header card --}}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
+            <div class="flex items-center justify-between">
+                {{-- Left: back + info --}}
+                <div class="flex items-center gap-4 min-w-0">
+                    <a href="{{ route('dashboard.events') }}"
+                       class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <h1 class="text-lg font-bold text-gray-900 truncate">{{ $event->title }}</h1>
+                            {{-- Status badge --}}
+                            @if($event->status->value === 'published')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold flex-shrink-0"
+                                      style="background-color:#dcfce7;color:#16a34a;">Publicado</span>
+                            @elseif($event->status->value === 'draft')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold flex-shrink-0"
+                                      style="background-color:#fef9c3;color:#a16207;">Rascunho</span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold flex-shrink-0"
+                                      style="background-color:#f3f4f6;color:#6b7280;">Cancelado</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-gray-500 mt-0.5">
+                            @if($event->city || $event->state)
+                                {{ $event->city }}{{ $event->city && $event->state ? ', ' : '' }}{{ $event->state }} ·
+                            @endif
+                            {{ $event->start_date->format('d/m/Y \à\s H:i') }}
+                            @if($event->location) · {{ $event->location }} @endif
+                        </p>
+                    </div>
                 </div>
-                {{-- Status badge --}}
-                @if($event->status->value === 'published')
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                          style="background-color:#dcfce7;color:#16a34a;">Publicado</span>
-                @elseif($event->status->value === 'draft')
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                          style="background-color:#fef9c3;color:#a16207;">Rascunho</span>
-                @else
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                          style="background-color:#f3f4f6;color:#6b7280;">Cancelado</span>
-                @endif
-            </div>
 
-            {{-- Action buttons --}}
-            <div class="flex items-center gap-2">
-                <a href="{{ route('dashboard.events.edit', $event) }}"
-                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                    Editar
-                </a>
+                {{-- Right: action buttons --}}
+                <div class="flex items-center gap-2 flex-shrink-0 ml-4">
+                    <a href="{{ route('dashboard.events.edit', $event) }}"
+                       class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Editar
+                    </a>
 
-                @if($event->status->value === 'draft')
-                    <form method="POST" action="{{ route('dashboard.events.publish', $event) }}">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit"
-                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition"
-                                style="background-color:#16a34a;color:white;">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Publicar
-                        </button>
-                    </form>
-                @endif
+                    @if($event->status->value === 'draft')
+                        <form method="POST" action="{{ route('dashboard.events.publish', $event) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition"
+                                    style="background-color:#16a34a;color:white;">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Publicar
+                            </button>
+                        </form>
+                    @endif
 
-                @if($event->status->value !== 'cancelled')
-                    <form id="form-cancel-{{ $event->id }}" method="POST" action="{{ route('dashboard.events.cancel', $event) }}">
-                        @csrf
-                        @method('PATCH')
-                        <button type="button" onclick="confirmCancelEvent()"
-                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition"
-                                style="background-color:#ef4444;color:white;">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                            Cancelar evento
-                        </button>
-                    </form>
-                @endif
+                    @if($event->status->value !== 'cancelled')
+                        <form id="form-cancel-{{ $event->id }}" method="POST" action="{{ route('dashboard.events.cancel', $event) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="button" onclick="confirmCancelEvent()"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border transition"
+                                    style="color:#ef4444;border-color:#fecaca;background:white;">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Cancelar evento
+                            </button>
+                        </form>
+                    @endif
+                </div>
             </div>
         </div>
 
