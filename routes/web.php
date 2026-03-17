@@ -8,6 +8,7 @@ use App\Http\Controllers\Web\Dashboard\OrderController as DashboardOrderControll
 use App\Http\Controllers\Web\Dashboard\ParticipantController;
 use App\Http\Controllers\Web\Dashboard\TicketController as DashboardTicketController;
 use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Web\MyTicketsController;
 use App\Http\Controllers\Web\PublicEventController;
 use App\Http\Middleware\EnsureHasOrganizer;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,10 @@ Route::middleware('guest')->group(function () {
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
+    // My Tickets routes
+    Route::get('my-tickets', [MyTicketsController::class, 'index'])->name('my-tickets');
+    Route::get('my-tickets/{ticket}', [MyTicketsController::class, 'show'])->name('my-tickets.show');
+
     // Checkout routes
     Route::post('checkout/order', [CheckoutController::class, 'createOrder'])->name('checkout.order');
     Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
