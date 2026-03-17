@@ -7,6 +7,9 @@ use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\OrganizerController;
 use App\Http\Controllers\API\OrganizerEventController;
 use App\Http\Controllers\API\TicketTypeController;
+use App\Http\Controllers\API\CheckinController;
+use App\Http\Controllers\API\DashboardController;
+use App\Http\Controllers\API\TicketController;
 use App\Http\Controllers\API\WebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +54,12 @@ Route::prefix('v1')->group(function () {
         Route::post('custom-fields', [CustomFieldController::class, 'store']);
         Route::put('custom-fields/{customField}', [CustomFieldController::class, 'update']);
         Route::delete('custom-fields/{customField}', [CustomFieldController::class, 'destroy']);
+
+        // Dashboard
+        Route::get('orders', [DashboardController::class, 'orders']);
+        Route::get('participants', [DashboardController::class, 'participants']);
+        Route::get('tickets', [DashboardController::class, 'tickets']);
+        Route::get('summary', [DashboardController::class, 'summary']);
     });
 
     // Orders
@@ -58,6 +67,10 @@ Route::prefix('v1')->group(function () {
         Route::post('orders', [OrderController::class, 'store']);
         Route::get('orders/my', [OrderController::class, 'myOrders']);
         Route::get('orders/{order}', [OrderController::class, 'show']);
+
+        Route::get('tickets/my', [TicketController::class, 'myTickets']);
+        Route::get('tickets/{ticket}', [TicketController::class, 'show']);
+        Route::post('checkin', CheckinController::class);
     });
 
     // Webhooks (public, no auth)
