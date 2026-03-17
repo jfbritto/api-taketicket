@@ -134,7 +134,7 @@ GET /checkout/{order}/status     → JSON endpoint for PIX polling
 - Custom fields ordered by `position`
 - Order summary sidebar: event name, ticket types x quantities, total price
 - Countdown timer showing order expiration (Alpine.js)
-- **Expired order handling**: if the order has expired when loading any checkout page, redirect to the event page with a flash message ("Order expired. Please try again.")
+- **Expired order handling**: if the order has expired when loading any checkout page, redirect to the event page with a flash message ("Your payment session expired. Please select your tickets again."). Inventory is restored by the scheduled `ExpireOrdersJob`.
 - **Pricing display**: only show total ticket price to the customer — platform fee is not visible (deducted from organizer side)
 
 ### Payment Page (`/checkout/{order}/payment`)
@@ -285,7 +285,7 @@ Save → creates as draft, redirects to events list.
   - Red: invalid ticket
   - Yellow: already used + timestamp of previous check-in
 - Running stats: checked-in / total tickets for selected event
-- **Undo check-in** button: reverts a ticket from USED back to VALID, deletes the checkin record (requires new `CheckinService::undoCheckin()` method)
+- **Undo check-in** button: reverts a ticket from USED back to VALID, deletes the checkin record (requires new `CheckinService::undoCheckin()` method). The undo action must track who performed it (operator user ID and timestamp) to prevent abuse.
 
 ### Check-in Routes
 
