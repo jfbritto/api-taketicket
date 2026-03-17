@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\Dashboard\DashboardController;
+use App\Http\Controllers\Web\Dashboard\DashboardEventController;
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\PublicEventController;
 use App\Http\Middleware\EnsureHasOrganizer;
@@ -28,6 +29,15 @@ Route::middleware('auth')->group(function () {
     // Dashboard (auth + organizer required)
     Route::prefix('dashboard')->middleware(EnsureHasOrganizer::class)->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-        // More routes added in Tasks 6, 7, 10
+
+        // Event CRUD
+        Route::get('events', [DashboardEventController::class, 'index'])->name('dashboard.events');
+        Route::get('events/create', [DashboardEventController::class, 'create'])->name('dashboard.events.create');
+        Route::post('events', [DashboardEventController::class, 'store'])->name('dashboard.events.store');
+        Route::get('events/{event}/edit', [DashboardEventController::class, 'edit'])->name('dashboard.events.edit');
+        Route::put('events/{event}', [DashboardEventController::class, 'update'])->name('dashboard.events.update');
+        Route::patch('events/{event}/publish', [DashboardEventController::class, 'publish'])->name('dashboard.events.publish');
+        Route::patch('events/{event}/cancel', [DashboardEventController::class, 'cancel'])->name('dashboard.events.cancel');
+        // More routes added in Tasks 7, 10
     });
 });

@@ -79,4 +79,80 @@ class DashboardTest extends TestCase
 
         $response->assertRedirect('/login');
     }
+
+    public function test_events_list_shows_organizer_events(): void
+    {
+        $organizer = Organizer::factory()->create();
+        Event::factory()->create(['organizer_id' => $organizer->id, 'title' => 'My Event']);
+
+        $response = $this->actingAs($organizer->user)->get('/dashboard/events');
+
+        $response->assertOk();
+        $response->assertSee('My Event');
+    }
+
+    public function test_create_event_page_renders(): void
+    {
+        $organizer = Organizer::factory()->create();
+
+        $response = $this->actingAs($organizer->user)->get('/dashboard/events/create');
+
+        $response->assertOk();
+        $response->assertSee('Create Event');
+    }
+
+    public function test_can_create_event(): void
+    {
+        $organizer = Organizer::factory()->create();
+
+        $response = $this->actingAs($organizer->user)->post('/dashboard/events', [
+            'title' => 'New Event',
+            'description' => 'A test event',
+            'location' => 'Convention Center',
+            'city' => 'Sao Paulo',
+            'state' => 'SP',
+            'start_date' => now()->addMonth()->format('Y-m-d\TH:i'),
+        ]);
+
+        $response->assertRedirect('/dashboard/events');
+        $this->assertDatabaseHas('events', ['title' => 'New Event']);
+    }
+
+    public function test_can_update_event(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+
+        $response = $this->actingAs($organizer->user)->put('/dashboard/events/' . $event->id, [
+            'title' => 'Updated Title',
+            'start_date' => now()->addMonth()->format('Y-m-d\TH:i'),
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('events', ['id' => $event->id, 'title' => 'Updated Title']);
+    }
+
+    public function test_can_publish_event(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id, 'status' => EventStatus::DRAFT]);
+        \App\Models\TicketType::factory()->create(['event_id' => $event->id]);
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response(['id' => 'acc_123'])]);
+
+        $response = $this->actingAs($organizer->user)->patch('/dashboard/events/' . $event->id . '/publish');
+
+        $response->assertRedirect();
+        $this->assertEquals(EventStatus::PUBLISHED, $event->fresh()->status);
+    }
+
+    public function test_cannot_manage_other_organizer_event(): void
+    {
+        $organizer1 = Organizer::factory()->create();
+        $organizer2 = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer1->id]);
+
+        $response = $this->actingAs($organizer2->user)->get('/dashboard/events/' . $event->id . '/edit');
+
+        $response->assertForbidden();
+    }
 }
