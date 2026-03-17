@@ -52,8 +52,7 @@
                                 <h2 class="text-base font-semibold text-gray-900">Perfil do Organizador</h2>
                                 <p class="text-xs text-gray-500 mt-0.5">Informações públicas do seu perfil</p>
                             </div>
-                            <button type="submit"
-                                    style="display:inline-block;background-color:#4f46e5;color:#ffffff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;"
+                            <button type="submit" style="background-color:#4f46e5;color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;">
                                 Salvar alterações
                             </button>
                         </div>
@@ -153,8 +152,7 @@
                                 <h2 class="text-base font-semibold text-gray-900">Segurança</h2>
                                 <p class="text-xs text-gray-500 mt-0.5">Use no mínimo 8 caracteres com letras e números.</p>
                             </div>
-                            <button type="submit"
-                                    style="display:inline-block;background-color:#4f46e5;color:#ffffff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;"
+                            <button type="submit" style="background-color:#4f46e5;color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;">
                                 Atualizar senha
                             </button>
                         </div>
