@@ -8,6 +8,8 @@ use App\Models\User;
 
 class OrganizerService
 {
+    public function __construct(private readonly AsaasService $asaasService) {}
+
     public function createOrganizer(User $user, CreateOrganizerDTO $dto): Organizer
     {
         return Organizer::create([
@@ -47,7 +49,7 @@ class OrganizerService
             return;
         }
 
-        // Will call AsaasService::createSubAccount() — implemented in Task 11
-        throw new \RuntimeException('AsaasService not yet configured. Complete Task 11.');
+        $result = $this->asaasService->createSubAccount($organizer);
+        $organizer->update(['asaas_account_id' => $result['id']]);
     }
 }
