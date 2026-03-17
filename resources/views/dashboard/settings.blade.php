@@ -53,7 +53,7 @@
                                 <p class="text-xs text-gray-500 mt-0.5">Informações públicas do seu perfil</p>
                             </div>
                             <button type="submit"
-                                    class="inline-flex items-center gap-2 px-5 py-2 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition shadow-sm">
+                                    style="background-color:#111827;color:#ffffff;" class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition shadow-sm"
                                 Salvar alterações
                             </button>
                         </div>
@@ -154,7 +154,7 @@
                                 <p class="text-xs text-gray-500 mt-0.5">Use no mínimo 8 caracteres com letras e números.</p>
                             </div>
                             <button type="submit"
-                                    class="inline-flex items-center gap-2 px-5 py-2 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition shadow-sm">
+                                    style="background-color:#111827;color:#ffffff;" class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition shadow-sm"
                                 Atualizar senha
                             </button>
                         </div>
