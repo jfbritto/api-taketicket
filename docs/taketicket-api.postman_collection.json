@@ -1,0 +1,1165 @@
+{
+  "info": {
+    "_postman_id": "taketicket-api-collection",
+    "name": "TAKETICKET API",
+    "description": "Comprehensive API collection for the TAKETICKET event ticketing platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"phone\": \"11999999999\",\n  \"document\": \"12345678901\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Register a new user account. Returns the created user and an authentication token."
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Authenticate with email and password. Returns the user and a Bearer token."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Revoke the current access token. Requires authentication."
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get the currently authenticated user's information."
+          }
+        }
+      ],
+      "description": "Authentication endpoints for registration, login, logout and retrieving the authenticated user."
+    },
+    {
+      "name": "Organizers",
+      "item": [
+        {
+          "name": "Create Organizer Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizers",
+              "host": ["{{base_url}}"],
+              "path": ["organizers"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Event Company\",\n  \"description\": \"We organize the best events in town.\",\n  \"logo\": \"https://example.com/logo.png\",\n  \"document\": \"12345678000199\",\n  \"phone\": \"11999999999\",\n  \"address\": \"Rua Exemplo, 123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"postal_code\": \"01310100\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create an organizer profile linked to the authenticated user. Each user can only have one organizer profile."
+          }
+        },
+        {
+          "name": "Get My Organizer Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizers/me",
+              "host": ["{{base_url}}"],
+              "path": ["organizers", "me"]
+            },
+            "description": "Get the organizer profile associated with the authenticated user."
+          }
+        },
+        {
+          "name": "Update Organizer Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizers/me",
+              "host": ["{{base_url}}"],
+              "path": ["organizers", "me"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Updated Event Company\",\n  \"description\": \"Updated description of our events.\",\n  \"logo\": \"https://example.com/new-logo.png\",\n  \"document\": \"12345678000199\",\n  \"phone\": \"11988888888\",\n  \"address\": \"Av. Paulista, 1000\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"postal_code\": \"01310100\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update the organizer profile associated with the authenticated user."
+          }
+        }
+      ],
+      "description": "Endpoints for managing organizer profiles."
+    },
+    {
+      "name": "Events (Public)",
+      "item": [
+        {
+          "name": "List Published Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/events?city=São Paulo&state=SP&date=2026-06-01",
+              "host": ["{{base_url}}"],
+              "path": ["events"],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "São Paulo",
+                  "description": "Filter events by city (optional)"
+                },
+                {
+                  "key": "state",
+                  "value": "SP",
+                  "description": "Filter events by state (optional, 2-letter code)"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-06-01",
+                  "description": "Filter events by date (optional, YYYY-MM-DD)"
+                }
+              ]
+            },
+            "description": "List all published events. Supports optional filters for city, state, and date."
+          }
+        },
+        {
+          "name": "Show Event by Slug",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/events/my-event-slug",
+              "host": ["{{base_url}}"],
+              "path": ["events", "my-event-slug"]
+            },
+            "description": "Get detailed information about a specific published event by its slug."
+          }
+        }
+      ],
+      "description": "Public endpoints for browsing and viewing events. No authentication required."
+    },
+    {
+      "name": "Events (Organizer)",
+      "item": [
+        {
+          "name": "List My Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events"]
+            },
+            "description": "List all events belonging to the authenticated organizer, paginated."
+          }
+        },
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Tech Conference 2026\",\n  \"description\": \"The biggest tech conference of the year.\",\n  \"location\": \"Centro de Convenções Frei Caneca\",\n  \"address\": \"Rua Frei Caneca, 569\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"start_date\": \"2026-08-15 09:00:00\",\n  \"end_date\": \"2026-08-15 18:00:00\",\n  \"banner\": \"https://example.com/banner.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new event for the authenticated organizer. The event starts in draft status."
+          }
+        },
+        {
+          "name": "Show Event",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1"]
+            },
+            "description": "Get detailed information for a specific event owned by the authenticated organizer. Includes ticket types and custom fields."
+          }
+        },
+        {
+          "name": "Update Event",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Tech Conference 2026 - Updated\",\n  \"description\": \"Updated description for the biggest tech conference.\",\n  \"location\": \"Centro de Convenções Frei Caneca\",\n  \"address\": \"Rua Frei Caneca, 569\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"start_date\": \"2026-08-16 09:00:00\",\n  \"end_date\": \"2026-08-16 18:00:00\",\n  \"banner\": \"https://example.com/new-banner.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update an existing event owned by the authenticated organizer."
+          }
+        },
+        {
+          "name": "Publish Event",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/publish",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "publish"]
+            },
+            "description": "Publish a draft event, making it publicly visible and open for ticket sales."
+          }
+        },
+        {
+          "name": "Cancel Event",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "cancel"]
+            },
+            "description": "Cancel a published event. This will prevent further ticket sales."
+          }
+        }
+      ],
+      "description": "Protected endpoints for organizers to manage their events. Requires an organizer profile."
+    },
+    {
+      "name": "Ticket Types",
+      "item": [
+        {
+          "name": "Create Ticket Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/ticket-types",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "ticket-types"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"VIP\",\n  \"description\": \"VIP access with priority seating and exclusive lounge.\",\n  \"price\": 299.90,\n  \"quantity\": 100,\n  \"sale_start\": \"2026-05-01 00:00:00\",\n  \"sale_end\": \"2026-08-14 23:59:59\",\n  \"max_per_user\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new ticket type for an event. The `available` field is automatically set to `quantity`."
+          }
+        },
+        {
+          "name": "Update Ticket Type",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/ticket-types/1",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "ticket-types", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"VIP Premium\",\n  \"description\": \"VIP Premium access with all exclusive benefits.\",\n  \"price\": 349.90,\n  \"quantity\": 50,\n  \"sale_start\": \"2026-05-01 00:00:00\",\n  \"sale_end\": \"2026-08-14 23:59:59\",\n  \"max_per_user\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update an existing ticket type for an event. All fields are optional (partial updates supported)."
+          }
+        },
+        {
+          "name": "Delete Ticket Type",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/ticket-types/1",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "ticket-types", "1"]
+            },
+            "description": "Delete a ticket type. Returns 422 if the ticket type has existing sales."
+          }
+        }
+      ],
+      "description": "Endpoints for managing ticket types within an event. Requires organizer ownership of the event."
+    },
+    {
+      "name": "Custom Fields",
+      "item": [
+        {
+          "name": "List Custom Fields",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/custom-fields",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "custom-fields"]
+            },
+            "description": "List all custom fields defined for an event."
+          }
+        },
+        {
+          "name": "Create Custom Field",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/custom-fields",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "custom-fields"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"T-Shirt Size\",\n  \"type\": \"select\",\n  \"required\": true,\n  \"options\": [\"P\", \"M\", \"G\", \"GG\"],\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a custom field for participant registration. Supported types: text, textarea, select, checkbox, radio, number, date."
+          }
+        },
+        {
+          "name": "Update Custom Field",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/custom-fields/1",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "custom-fields", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Shirt Size\",\n  \"type\": \"select\",\n  \"required\": false,\n  \"options\": [\"PP\", \"P\", \"M\", \"G\", \"GG\", \"XGG\"],\n  \"position\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update an existing custom field. All fields are optional (partial updates supported)."
+          }
+        },
+        {
+          "name": "Delete Custom Field",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/custom-fields/1",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "custom-fields", "1"]
+            },
+            "description": "Delete a custom field. Returns 422 if the field has existing participant values."
+          }
+        }
+      ],
+      "description": "Endpoints for managing custom registration fields on an event. Requires organizer ownership."
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": ["{{base_url}}"],
+              "path": ["orders"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_id\": 1,\n  \"billing_type\": \"PIX\",\n  \"items\": [\n    {\n      \"ticket_type_id\": 1,\n      \"quantity\": 2,\n      \"participants\": [\n        {\n          \"name\": \"Alice Smith\",\n          \"email\": \"alice@example.com\",\n          \"document\": \"98765432100\",\n          \"phone\": \"11988887777\",\n          \"birth_date\": \"1990-05-15\",\n          \"gender\": \"female\",\n          \"custom_fields\": {\n            \"1\": \"M\"\n          }\n        },\n        {\n          \"name\": \"Bob Jones\",\n          \"email\": \"bob@example.com\",\n          \"document\": \"11122233344\",\n          \"phone\": \"11977776666\",\n          \"birth_date\": \"1988-11-20\",\n          \"gender\": \"male\",\n          \"custom_fields\": {\n            \"1\": \"G\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new order. The number of participants in each item must match the requested quantity. Supported billing types: PIX, CREDIT_CARD."
+          }
+        },
+        {
+          "name": "My Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/my",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "my"]
+            },
+            "description": "List all orders placed by the authenticated user, paginated."
+          }
+        },
+        {
+          "name": "Show Order",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "1"]
+            },
+            "description": "Get details of a specific order, including payment info and PIX QR code if applicable. Only accessible by the order owner."
+          }
+        }
+      ],
+      "description": "Endpoints for creating and viewing ticket orders."
+    },
+    {
+      "name": "Checkout",
+      "item": [
+        {
+          "name": "Create Checkout Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/checkout/order",
+              "host": ["{{base_url}}"],
+              "path": ["checkout", "order"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_id\": 1,\n  \"billing_type\": \"PIX\",\n  \"items\": [\n    {\n      \"ticket_type_id\": 1,\n      \"quantity\": 1,\n      \"participants\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"document\": \"55566677788\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Initiate the checkout process and create an order. Returns payment information."
+          }
+        },
+        {
+          "name": "Get Checkout Order Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/checkout/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["checkout", "1", "status"]
+            },
+            "description": "Get the payment status of a specific checkout order."
+          }
+        }
+      ],
+      "description": "Checkout flow endpoints for initiating payments and checking order status."
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Asaas Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "asaas-access-token",
+                "value": "your-asaas-webhook-token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/webhooks/asaas",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks", "asaas"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"PAYMENT_RECEIVED\",\n  \"payment\": {\n    \"id\": \"pay_123456789\",\n    \"customer\": \"cus_000005113026\",\n    \"value\": 299.90,\n    \"netValue\": 287.02,\n    \"billingType\": \"PIX\",\n    \"status\": \"RECEIVED\",\n    \"dueDate\": \"2026-08-15\",\n    \"paymentDate\": \"2026-08-01\",\n    \"externalReference\": \"order_1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Endpoint to receive payment webhook notifications from Asaas. Requires a valid Asaas webhook token. No user authentication required."
+          }
+        }
+      ],
+      "description": "Webhook endpoints for receiving payment gateway notifications. No user auth required."
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "My Tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets/my",
+              "host": ["{{base_url}}"],
+              "path": ["tickets", "my"]
+            },
+            "description": "List all non-cancelled tickets belonging to the authenticated user, paginated."
+          }
+        },
+        {
+          "name": "Show Ticket",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets/1",
+              "host": ["{{base_url}}"],
+              "path": ["tickets", "1"]
+            },
+            "description": "Get detailed information for a specific ticket. Only accessible by the ticket owner."
+          }
+        }
+      ],
+      "description": "Endpoints for viewing tickets purchased by the authenticated user."
+    },
+    {
+      "name": "Check-in",
+      "item": [
+        {
+          "name": "Validate Check-in",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/checkin",
+              "host": ["{{base_url}}"],
+              "path": ["checkin"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticket_code\": \"TKT-ABCD1234\",\n  \"device\": \"scanner-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Validate a ticket for check-in using a ticket code or QR code payload. Provide either `ticket_code` or `qr_code_payload`. Returns status: valid, already_used, or invalid."
+          }
+        },
+        {
+          "name": "Validate Check-in via QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/checkin",
+              "host": ["{{base_url}}"],
+              "path": ["checkin"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_code_payload\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"device\": \"scanner-02\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Validate a ticket for check-in using a QR code payload. Returns status: valid, already_used, or invalid."
+          }
+        }
+      ],
+      "description": "Endpoints for checking in event participants by scanning tickets or QR codes."
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Event Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/summary",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "summary"]
+            },
+            "description": "Get a summary dashboard for an event, including total revenue, ticket counts, check-in rates, and other statistics."
+          }
+        },
+        {
+          "name": "Event Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/orders",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "orders"]
+            },
+            "description": "List all orders for a specific event, paginated. Includes user, items, and payment details."
+          }
+        },
+        {
+          "name": "Event Participants",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/participants",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "participants"]
+            },
+            "description": "List all participants registered for a specific event, paginated. Includes ticket type and custom field values."
+          }
+        },
+        {
+          "name": "Event Tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/organizer/events/1/tickets",
+              "host": ["{{base_url}}"],
+              "path": ["organizer", "events", "1", "tickets"]
+            },
+            "description": "List all tickets issued for a specific event, paginated. Includes participant and ticket type details."
+          }
+        }
+      ],
+      "description": "Dashboard endpoints for organizers to monitor event performance, orders, participants and tickets."
+    }
+  ]
+}
