@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Web\Dashboard;
 
 use App\DTO\CreateEventDTO;
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\CustomField;
 use App\Models\Event;
+use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Services\EventService;
 use Illuminate\Http\RedirectResponse;
@@ -28,6 +30,50 @@ class DashboardEventController extends Controller
         $events = $query->latest()->paginate(15);
 
         return view('dashboard.events.index', compact('events'));
+    }
+
+    public function show(Request $request, Event $event): View
+    {
+        $organizer = $request->user()->organizer;
+        abort_if($event->organizer_id !== $organizer->id, 403);
+
+        $ticketTypes = $event->ticketTypes->map(function ($type) {
+            $type->sold_count = $type->orderItems()
+                ->whereHas('order', fn ($q) => $q->where('status', OrderStatus::PAID))
+                ->sum('quantity');
+            return $type;
+        });
+
+        $totalSold = $event->tickets()
+            ->whereHas('orderItem.order', fn ($q) => $q->where('status', OrderStatus::PAID))
+            ->count();
+
+        $totalRevenue = $event->orders()
+            ->where('status', OrderStatus::PAID)
+            ->sum('organizer_amount');
+
+        $totalCheckins = $event->tickets()
+            ->whereNotNull('checked_in_at')
+            ->count();
+
+        $totalCapacity = $event->ticketTypes()->sum('quantity');
+
+        $recentOrders = $event->orders()
+            ->where('status', OrderStatus::PAID)
+            ->with('user')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('dashboard.events.show', compact(
+            'event',
+            'ticketTypes',
+            'totalSold',
+            'totalRevenue',
+            'totalCheckins',
+            'totalCapacity',
+            'recentOrders'
+        ));
     }
 
     public function create(): View
@@ -56,7 +102,7 @@ class DashboardEventController extends Controller
         $dto = CreateEventDTO::fromRequest($validated);
         $this->eventService->createEvent($request->user()->organizer, $dto);
 
-        return redirect()->route('dashboard.events')->with('success', 'Event created as draft.');
+        return redirect()->route('dashboard.events')->with('success', 'Evento criado como rascunho.');
     }
 
     public function edit(Request $request, Event $event): View
@@ -172,7 +218,7 @@ class DashboardEventController extends Controller
             ->whereDoesntHave('values')
             ->delete();
 
-        return redirect()->route('dashboard.events.edit', $event)->with('success', 'Event updated.');
+        return redirect()->route('dashboard.events.edit', $event)->with('success', 'Evento atualizado com sucesso.');
     }
 
     public function publish(Request $request, Event $event): RedirectResponse
@@ -182,7 +228,7 @@ class DashboardEventController extends Controller
         try {
             $this->eventService->publishEvent($event);
 
-            return redirect()->back()->with('success', 'Event published!');
+            return redirect()->back()->with('success', 'Evento publicado com sucesso!');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -195,7 +241,7 @@ class DashboardEventController extends Controller
         try {
             $this->eventService->cancelEvent($event);
 
-            return redirect()->back()->with('success', 'Event cancelled.');
+            return redirect()->back()->with('success', 'Evento cancelado.');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

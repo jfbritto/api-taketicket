@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::get('events', [DashboardEventController::class, 'index'])->name('dashboard.events');
         Route::get('events/create', [DashboardEventController::class, 'create'])->name('dashboard.events.create');
         Route::post('events', [DashboardEventController::class, 'store'])->name('dashboard.events.store');
+        Route::get('events/{event}', [DashboardEventController::class, 'show'])->name('dashboard.events.show');
         Route::get('events/{event}/edit', [DashboardEventController::class, 'edit'])->name('dashboard.events.edit');
         Route::put('events/{event}', [DashboardEventController::class, 'update'])->name('dashboard.events.update');
         Route::patch('events/{event}/publish', [DashboardEventController::class, 'publish'])->name('dashboard.events.publish');
