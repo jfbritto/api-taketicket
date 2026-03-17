@@ -155,4 +155,68 @@ class DashboardTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_orders_page_renders(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        Order::factory()->create(['event_id' => $event->id]);
+
+        $response = $this->actingAs($organizer->user)->get("/dashboard/events/{$event->id}/orders");
+
+        $response->assertOk();
+    }
+
+    public function test_order_detail_page_renders(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        $order = Order::factory()->create(['event_id' => $event->id]);
+
+        $response = $this->actingAs($organizer->user)->get("/dashboard/events/{$event->id}/orders/{$order->id}");
+
+        $response->assertOk();
+    }
+
+    public function test_cannot_view_other_organizer_orders(): void
+    {
+        $organizer1 = Organizer::factory()->create();
+        $organizer2 = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer1->id]);
+
+        $response = $this->actingAs($organizer2->user)->get("/dashboard/events/{$event->id}/orders");
+
+        $response->assertForbidden();
+    }
+
+    public function test_participants_page_renders_with_search(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+
+        $response = $this->actingAs($organizer->user)->get("/dashboard/events/{$event->id}/participants?search=john");
+
+        $response->assertOk();
+    }
+
+    public function test_participants_csv_export(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+
+        $response = $this->actingAs($organizer->user)->get("/dashboard/events/{$event->id}/participants/export");
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    }
+
+    public function test_tickets_page_renders_with_search(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+
+        $response = $this->actingAs($organizer->user)->get("/dashboard/events/{$event->id}/tickets?search=TKT");
+
+        $response->assertOk();
+    }
 }

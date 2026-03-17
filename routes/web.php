@@ -3,6 +3,9 @@
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\Dashboard\DashboardController;
 use App\Http\Controllers\Web\Dashboard\DashboardEventController;
+use App\Http\Controllers\Web\Dashboard\OrderController as DashboardOrderController;
+use App\Http\Controllers\Web\Dashboard\ParticipantController;
+use App\Http\Controllers\Web\Dashboard\TicketController as DashboardTicketController;
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\PublicEventController;
 use App\Http\Middleware\EnsureHasOrganizer;
@@ -38,6 +41,11 @@ Route::middleware('auth')->group(function () {
         Route::put('events/{event}', [DashboardEventController::class, 'update'])->name('dashboard.events.update');
         Route::patch('events/{event}/publish', [DashboardEventController::class, 'publish'])->name('dashboard.events.publish');
         Route::patch('events/{event}/cancel', [DashboardEventController::class, 'cancel'])->name('dashboard.events.cancel');
-        // More routes added in Tasks 7, 10
+        // Orders, Participants, Tickets
+        Route::get('events/{event}/orders', [DashboardOrderController::class, 'index'])->name('dashboard.orders');
+        Route::get('events/{event}/orders/{order}', [DashboardOrderController::class, 'show'])->name('dashboard.orders.show');
+        Route::get('events/{event}/participants', [ParticipantController::class, 'index'])->name('dashboard.participants');
+        Route::get('events/{event}/participants/export', [ParticipantController::class, 'export'])->name('dashboard.participants.export');
+        Route::get('events/{event}/tickets', [DashboardTicketController::class, 'index'])->name('dashboard.tickets');
     });
 });
