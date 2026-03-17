@@ -21,14 +21,14 @@ class AuthWebTest extends TestCase
     {
         $response = $this->get('/login');
         $response->assertOk();
-        $response->assertSee('Login');
+        $response->assertSee('Entrar');
     }
 
     public function test_register_page_renders(): void
     {
         $response = $this->get('/register');
         $response->assertOk();
-        $response->assertSee('Register');
+        $response->assertSee('Criar sua conta');
     }
 
     public function test_user_can_login(): void

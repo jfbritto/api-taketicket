@@ -24,7 +24,7 @@
         @endif
 
         {{-- Ticket Types --}}
-        <x-card title="Tickets">
+        <x-card title="Ingressos">
             <form method="POST" action="{{ route('checkout.order') }}" x-data="ticketSelector()" id="ticket-form">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
@@ -45,16 +45,16 @@
                                     <p class="text-sm text-gray-500">{{ $ticketType->description }}</p>
                                 @endif
                                 <p class="text-lg font-bold text-indigo-600 mt-1">
-                                    {{ $ticketType->price > 0 ? 'R$ ' . number_format($ticketType->price, 2, ',', '.') : 'Free' }}
+                                    {{ $ticketType->price > 0 ? 'R$ ' . number_format($ticketType->price, 2, ',', '.') : 'Gratuito' }}
                                 </p>
                             </div>
                             <div class="flex items-center gap-2">
                                 @if($soldOut)
-                                    <x-badge type="cancelled">Sold Out</x-badge>
+                                    <x-badge type="cancelled">Esgotado</x-badge>
                                 @elseif($upcoming)
-                                    <x-badge type="pending">Starts {{ $ticketType->sale_start->format('d/m') }}</x-badge>
+                                    <x-badge type="pending">Vendas a partir de {{ $ticketType->sale_start->format('d/m') }}</x-badge>
                                 @elseif($ended)
-                                    <x-badge type="expired">Ended</x-badge>
+                                    <x-badge type="expired">Vendas encerradas</x-badge>
                                 @else
                                     <select name="items[{{ $ticketType->id }}][quantity]"
                                             @change="updateTotal()"
@@ -77,7 +77,7 @@
                     </div>
                     <button type="submit" :disabled="total === 0 && !hasFreeTickets"
                             class="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                        Buy Tickets
+                        Comprar Ingressos
                     </button>
                 </div>
             </form>

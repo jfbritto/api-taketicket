@@ -39,7 +39,7 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($user)->get('/dashboard/onboarding');
 
         $response->assertOk();
-        $response->assertSee('Create Organizer Profile');
+        $response->assertSee('Criar Perfil de Organizador');
     }
 
     public function test_can_create_organizer_via_onboarding(): void
@@ -100,7 +100,7 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($organizer->user)->get('/dashboard/events/create');
 
         $response->assertOk();
-        $response->assertSee('Create Event');
+        $response->assertSee('Criar Evento');
     }
 
     public function test_can_create_event(): void

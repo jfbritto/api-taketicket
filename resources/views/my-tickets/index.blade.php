@@ -1,12 +1,12 @@
-<x-layouts.app title="My Tickets">
+<x-layouts.app title="Meus Ingressos">
     <div class="max-w-5xl mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">My Tickets</h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Meus Ingressos</h1>
 
         @if($tickets->isEmpty())
             <div class="bg-white rounded-lg shadow-sm border p-12 text-center">
-                <p class="text-gray-500 text-lg">You have no tickets yet.</p>
+                <p class="text-gray-500 text-lg">Você ainda não tem ingressos.</p>
                 <a href="{{ route('home') }}" class="mt-4 inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-semibold transition">
-                    Browse Events
+                    Explorar Eventos
                 </a>
             </div>
         @else
@@ -24,22 +24,22 @@
                                 <div class="flex items-center justify-between">
                                     <span class="font-medium text-gray-800">{{ $ticket->ticketType->name }}</span>
                                     @if($ticket->status === \App\Enums\TicketStatus::VALID)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Valid</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Válido</span>
                                     @elseif($ticket->status === \App\Enums\TicketStatus::USED)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Used</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Utilizado</span>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelado</span>
                                     @endif
                                 </div>
 
                                 <div class="text-sm text-gray-600">
-                                    <p><span class="font-medium">Participant:</span> {{ $ticket->participant?->name ?? 'N/A' }}</p>
-                                    <p class="mt-1"><span class="font-medium">Ticket Code:</span> {{ $ticket->ticket_code }}</p>
+                                    <p><span class="font-medium">Participante:</span> {{ $ticket->participant?->name ?? 'N/A' }}</p>
+                                    <p class="mt-1"><span class="font-medium">Código:</span> {{ $ticket->ticket_code }}</p>
                                 </div>
 
                                 <a href="{{ route('my-tickets.show', $ticket) }}"
                                    class="mt-auto inline-block text-center bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 text-sm font-semibold transition">
-                                    View Ticket
+                                    Ver Ingresso
                                 </a>
                             </div>
                         @endforeach

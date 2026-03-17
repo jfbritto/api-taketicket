@@ -1,6 +1,6 @@
-<x-layouts.checkout :title="'Payment — ' . $order->event->title">
+<x-layouts.checkout :title="'Pagamento — ' . $order->event->title">
     <div class="max-w-5xl mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">Payment</h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Pagamento</h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Payment Section --}}
@@ -12,7 +12,7 @@
                          x-data="pixPoller('{{ route('checkout.status', $order) }}')"
                          x-init="startPolling()">
 
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Pay via PIX</h2>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Pagar via PIX</h2>
 
                         <div class="text-center mb-6">
                             @if(!empty($pixData['encodedImage']))
@@ -24,7 +24,7 @@
 
                         @if(!empty($pixData['payload']))
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">PIX Copy & Paste Code</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Código PIX — Copia e Cola</label>
                                 <div class="flex gap-2">
                                     <input type="text"
                                            readonly
@@ -34,24 +34,28 @@
                                     <button type="button"
                                             @click="copyPix()"
                                             class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm whitespace-nowrap">
-                                        <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                                        <span x-text="copied ? 'Copiado!' : 'Copiar'"></span>
                                     </button>
                                 </div>
                             </div>
                         @endif
 
+                        <p class="text-sm text-gray-500 mt-4 text-center">
+                            Abra o app do seu banco, escolha pagar via PIX e escaneie o QR Code ou cole o código acima.
+                        </p>
+
                         <div class="mt-4 text-center text-sm text-gray-500" x-show="!paid">
-                            Waiting for payment confirmation...
+                            Aguardando confirmação do pagamento...
                         </div>
                         <div class="mt-4 text-center text-green-600 font-semibold" x-show="paid">
-                            Payment confirmed! Redirecting...
+                            Pagamento confirmado! Redirecionando...
                         </div>
                     </div>
 
                 @else
                     {{-- Payment Method Selection --}}
                     <div class="bg-white rounded-lg shadow-sm border p-6">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Select Payment Method</h2>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Selecione a Forma de Pagamento</h2>
 
                         <form method="POST" action="{{ route('checkout.processPayment', $order) }}" x-data="{ method: 'PIX' }">
                             @csrf
@@ -62,7 +66,7 @@
                                     <input type="radio" name="billing_type" value="PIX" x-model="method" class="text-indigo-600">
                                     <div>
                                         <p class="font-medium">PIX</p>
-                                        <p class="text-sm text-gray-500">Instant payment, confirmed immediately</p>
+                                        <p class="text-sm text-gray-500">Pagamento instantâneo, aprovado na hora</p>
                                     </div>
                                 </label>
 
@@ -70,15 +74,15 @@
                                        :class="method === 'CREDIT_CARD' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'">
                                     <input type="radio" name="billing_type" value="CREDIT_CARD" x-model="method" class="text-indigo-600">
                                     <div>
-                                        <p class="font-medium">Credit Card</p>
-                                        <p class="text-sm text-gray-500">Pay securely via our payment partner</p>
+                                        <p class="font-medium">Cartão de Crédito</p>
+                                        <p class="text-sm text-gray-500">Pague com segurança via nossa parceira de pagamento</p>
                                     </div>
                                 </label>
                             </div>
 
                             <button type="submit"
                                     class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 font-semibold text-lg transition">
-                                Proceed with Payment
+                                Prosseguir com o Pagamento
                             </button>
                         </form>
                     </div>
@@ -88,7 +92,7 @@
             {{-- Order Summary Sidebar --}}
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow-sm border p-6 sticky top-4">
-                    <h2 class="font-semibold text-gray-900 text-lg mb-4">Order Summary</h2>
+                    <h2 class="font-semibold text-gray-900 text-lg mb-4">Resumo do Pedido</h2>
 
                     <div class="text-sm text-gray-600 mb-4">
                         <p class="font-medium text-gray-800">{{ $order->event->title }}</p>

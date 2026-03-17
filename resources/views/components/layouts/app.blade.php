@@ -21,15 +21,15 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     @auth
-                        <a href="{{ url('/my-tickets') }}" class="text-gray-600 hover:text-gray-900">My Tickets</a>
-                        <a href="{{ url('/dashboard') }}" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+                        <a href="{{ url('/my-tickets') }}" class="text-gray-600 hover:text-gray-900">Meus Ingressos</a>
+                        <a href="{{ url('/dashboard') }}" class="text-gray-600 hover:text-gray-900">Painel</a>
                         <form method="POST" action="{{ url('/logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="text-gray-600 hover:text-gray-900">Logout</button>
+                            <button type="submit" class="text-gray-600 hover:text-gray-900">Sair</button>
                         </form>
                     @else
-                        <a href="{{ url('/login') }}" class="text-gray-600 hover:text-gray-900">Login</a>
-                        <a href="{{ url('/register') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Register</a>
+                        <a href="{{ url('/login') }}" class="text-gray-600 hover:text-gray-900">Entrar</a>
+                        <a href="{{ url('/register') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Cadastrar-se</a>
                     @endauth
                 </div>
             </div>
@@ -52,10 +52,11 @@
     {{-- Footer --}}
     <footer class="bg-white border-t py-8 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            &copy; {{ date('Y') }} TakeTicket. All rights reserved.
+            &copy; {{ date('Y') }} TakeTicket. Todos os direitos reservados.
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/imask@7.6.1/dist/imask.min.js"></script>
     @stack('scripts')
 </body>
 </html>
