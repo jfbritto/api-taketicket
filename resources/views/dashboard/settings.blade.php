@@ -46,6 +46,18 @@
                         @csrf
                         @method('PUT')
 
+                        {{-- Top action bar --}}
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h2 class="text-base font-semibold text-gray-900">Perfil do Organizador</h2>
+                                <p class="text-xs text-gray-500 mt-0.5">Informações públicas do seu perfil</p>
+                            </div>
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 px-5 py-2 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition shadow-sm">
+                                Salvar alterações
+                            </button>
+                        </div>
+
                         {{-- Logo section --}}
                         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm mb-4">
                             <div class="px-6 py-5 flex items-center justify-between">
@@ -127,25 +139,27 @@
                             </div>
                         @endif
 
-                        <div class="flex justify-end">
-                            <button type="submit"
-                                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition shadow-sm">
-                                Salvar alterações
-                            </button>
-                        </div>
                     </form>
                 </div>
 
                 {{-- Security tab --}}
                 <div x-show="tab === 'security'" x-cloak>
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
-                        <div class="px-6 pt-5 pb-1">
-                            <h3 class="text-sm font-semibold text-gray-900">Alterar senha</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">Use no mínimo 8 caracteres com letras e números.</p>
+                    <form method="POST" action="{{ route('dashboard.settings.password') }}">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h2 class="text-base font-semibold text-gray-900">Segurança</h2>
+                                <p class="text-xs text-gray-500 mt-0.5">Use no mínimo 8 caracteres com letras e números.</p>
+                            </div>
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 px-5 py-2 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition shadow-sm">
+                                Atualizar senha
+                            </button>
                         </div>
-                        <form method="POST" action="{{ route('dashboard.settings.password') }}">
-                            @csrf
-                            @method('PUT')
+
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
                             <div class="px-6 py-5 space-y-4">
                                 <x-input label="Senha atual" name="current_password" type="password" placeholder="••••••••" />
                                 <div class="grid grid-cols-2 gap-4">
@@ -153,14 +167,8 @@
                                     <x-input label="Confirmar nova senha" name="new_password_confirmation" type="password" placeholder="Repita a nova senha" />
                                 </div>
                             </div>
-                            <div class="px-6 pb-6 flex justify-end">
-                                <button type="submit"
-                                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition shadow-sm">
-                                    Atualizar senha
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
 
             </div>
