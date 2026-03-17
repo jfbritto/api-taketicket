@@ -4,6 +4,7 @@ namespace Tests\Feature\Web;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthWebTest extends TestCase
@@ -32,7 +33,7 @@ class AuthWebTest extends TestCase
 
     public function test_user_can_login(): void
     {
-        $user = User::factory()->create(['password' => bcrypt('password123')]);
+        $user = User::factory()->create(['password' => Hash::make('password123')]);
 
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -83,13 +84,9 @@ class AuthWebTest extends TestCase
 
     public function test_login_redirects_to_intended_url(): void
     {
-        // Register a temporary protected route for this test
-        \Illuminate\Support\Facades\Route::get('/my-tickets', fn () => 'ok')->middleware('auth');
+        $user = User::factory()->create(['password' => Hash::make('password123')]);
 
-        $user = User::factory()->create(['password' => bcrypt('password123')]);
-
-        // Try to access protected page first — auth middleware sets intended URL
-        $this->get('/my-tickets');
+        session()->put('url.intended', '/my-tickets');
 
         $response = $this->post('/login', [
             'email' => $user->email,
