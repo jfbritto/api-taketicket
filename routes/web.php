@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\CheckoutController;
 use App\Http\Controllers\Web\Dashboard\DashboardController;
 use App\Http\Controllers\Web\Dashboard\DashboardEventController;
 use App\Http\Controllers\Web\Dashboard\OrderController as DashboardOrderController;
@@ -25,6 +26,16 @@ Route::middleware('guest')->group(function () {
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
+    // Checkout routes
+    Route::post('checkout/order', [CheckoutController::class, 'createOrder'])->name('checkout.order');
+    Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
+    Route::get('checkout/{order}', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('checkout/{order}', [CheckoutController::class, 'saveParticipants'])->name('checkout.participants');
+    Route::get('checkout/{order}/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+    Route::post('checkout/{order}/payment', [CheckoutController::class, 'processPayment'])->name('checkout.processPayment');
+    Route::get('checkout/{order}/status', [CheckoutController::class, 'status'])->name('checkout.status');
+
     // Dashboard onboarding (auth but NO organizer middleware)
     Route::get('dashboard/onboarding', [DashboardController::class, 'onboarding'])->name('dashboard.onboarding');
     Route::post('dashboard/onboarding', [DashboardController::class, 'storeOrganizer'])->name('dashboard.storeOrganizer');

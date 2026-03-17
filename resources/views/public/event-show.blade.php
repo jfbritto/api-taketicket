@@ -25,7 +25,7 @@
 
         {{-- Ticket Types --}}
         <x-card title="Tickets">
-            <form method="POST" action="{{ url('/checkout/order') }}" x-data="ticketSelector()" id="ticket-form">
+            <form method="POST" action="{{ route('checkout.order') }}" x-data="ticketSelector()" id="ticket-form">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
 
