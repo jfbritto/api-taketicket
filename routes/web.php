@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\Dashboard\DashboardController;
 use App\Http\Controllers\Web\Dashboard\DashboardEventController;
 use App\Http\Controllers\Web\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Web\Dashboard\ParticipantController;
+use App\Http\Controllers\Web\Dashboard\SettingsController;
 use App\Http\Controllers\Web\Dashboard\TicketController as DashboardTicketController;
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\MyTicketsController;
@@ -69,5 +70,10 @@ Route::middleware('auth')->group(function () {
         Route::get('checkin', [CheckinController::class, 'index'])->name('dashboard.checkin');
         Route::post('checkin/validate', [CheckinController::class, 'validateTicket'])->name('dashboard.checkin.validate');
         Route::post('checkin/undo', [CheckinController::class, 'undo'])->name('dashboard.checkin.undo');
+
+        // Settings
+        Route::get('settings', [SettingsController::class, 'index'])->name('dashboard.settings');
+        Route::put('settings/organizer', [SettingsController::class, 'updateOrganizer'])->name('dashboard.settings.organizer');
+        Route::put('settings/password', [SettingsController::class, 'updatePassword'])->name('dashboard.settings.password');
     });
 });
