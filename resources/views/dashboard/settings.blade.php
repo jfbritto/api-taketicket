@@ -19,16 +19,16 @@
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Conta</p>
                 <nav class="space-y-0.5">
                     <button @click="tab = 'profile'" type="button"
-                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition font-medium text-left"
-                            :class="tab === 'profile' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'">
+                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition font-medium text-left border-l-2"
+                            :class="tab === 'profile' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800 hover:bg-gray-50'">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                         Perfil
                     </button>
                     <button @click="tab = 'security'" type="button"
-                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition font-medium text-left"
-                            :class="tab === 'security' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'">
+                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition font-medium text-left border-l-2"
+                            :class="tab === 'security' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800 hover:bg-gray-50'">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                         </svg>
@@ -84,11 +84,11 @@
                                 <h3 class="text-sm font-semibold text-gray-900">Informações do Organizador</h3>
                             </div>
                             <div class="px-6 py-5 space-y-4">
-                                <x-input label="Nome do Organizador" name="name" :value="$organizer->name" required />
-                                <x-textarea label="Descrição" name="description" rows="3" :value="$organizer->description" />
+                                <x-input label="Nome do Organizador" name="name" :value="$organizer->name" placeholder="Ex: João Silva Produções" required />
+                                <x-textarea label="Descrição" name="description" rows="3" :value="$organizer->description" placeholder="Fale um pouco sobre sua empresa ou projeto..." />
                                 <div class="grid grid-cols-2 gap-4">
-                                    <x-input label="Telefone" name="phone" :value="$organizer->phone" class="mask-phone" />
-                                    <x-input label="CNPJ / CPF" name="document" :value="$organizer->document" class="mask-cnpj" />
+                                    <x-input label="Telefone" name="phone" :value="$organizer->phone" class="mask-phone" placeholder="(11) 99999-9999" />
+                                    <x-input label="CNPJ / CPF" name="document" :value="$organizer->document" class="mask-cnpj" placeholder="00.000.000/0000-00" />
                                 </div>
                             </div>
                         </div>
@@ -99,16 +99,16 @@
                                 <h3 class="text-sm font-semibold text-gray-900">Endereço</h3>
                             </div>
                             <div class="px-6 py-5 space-y-4">
-                                <x-input label="Logradouro" name="address" :value="$organizer->address" />
+                                <x-input label="Logradouro" name="address" :value="$organizer->address" placeholder="Av. Paulista, 1000" />
                                 <div class="grid grid-cols-6 gap-4">
                                     <div class="col-span-3">
-                                        <x-input label="Cidade" name="city" :value="$organizer->city" />
+                                        <x-input label="Cidade" name="city" :value="$organizer->city" placeholder="São Paulo" />
                                     </div>
                                     <div class="col-span-1">
-                                        <x-input label="UF" name="state" :value="$organizer->state" maxlength="2" />
+                                        <x-input label="UF" name="state" :value="$organizer->state" maxlength="2" placeholder="SP" />
                                     </div>
                                     <div class="col-span-2">
-                                        <x-input label="CEP" name="postal_code" :value="$organizer->postal_code" class="mask-cep" />
+                                        <x-input label="CEP" name="postal_code" :value="$organizer->postal_code" class="mask-cep" placeholder="00000-000" />
                                     </div>
                                 </div>
                             </div>
@@ -147,10 +147,10 @@
                             @csrf
                             @method('PUT')
                             <div class="px-6 py-5 space-y-4">
-                                <x-input label="Senha atual" name="current_password" type="password" />
+                                <x-input label="Senha atual" name="current_password" type="password" placeholder="••••••••" />
                                 <div class="grid grid-cols-2 gap-4">
-                                    <x-input label="Nova senha" name="new_password" type="password" />
-                                    <x-input label="Confirmar nova senha" name="new_password_confirmation" type="password" />
+                                    <x-input label="Nova senha" name="new_password" type="password" placeholder="Mínimo 8 caracteres" />
+                                    <x-input label="Confirmar nova senha" name="new_password_confirmation" type="password" placeholder="Repita a nova senha" />
                                 </div>
                             </div>
                             <div class="px-6 pb-6 flex justify-end">
