@@ -7,6 +7,7 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\CustomField;
 use App\Models\Event;
+use App\Models\OrderItem;
 use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Services\EventService;
@@ -34,13 +35,17 @@ class DashboardEventController extends Controller
 
     public function show(Request $request, Event $event): View
     {
-        $organizer = $request->user()->organizer;
-        abort_if($event->organizer_id !== $organizer->id, 403);
+        $this->authorize('manage', $event);
 
-        $ticketTypes = $event->ticketTypes->map(function ($type) {
-            $type->sold_count = $type->orderItems()
-                ->whereHas('order', fn ($q) => $q->where('status', OrderStatus::PAID))
-                ->sum('quantity');
+        // Load sold count per ticket type in a single query to avoid N+1
+        $soldByType = OrderItem::query()
+            ->selectRaw('ticket_type_id, SUM(quantity) as sold_count')
+            ->whereHas('order', fn ($q) => $q->where('status', OrderStatus::PAID)->where('event_id', $event->id))
+            ->groupBy('ticket_type_id')
+            ->pluck('sold_count', 'ticket_type_id');
+
+        $ticketTypes = $event->ticketTypes->map(function ($type) use ($soldByType) {
+            $type->sold_count = $soldByType->get($type->id, 0);
             return $type;
         });
 

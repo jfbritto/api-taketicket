@@ -48,7 +48,7 @@ class CheckoutController extends Controller
         }
 
         if (empty($items)) {
-            return back()->with('error', 'Please select at least one ticket.');
+            return back()->with('error', 'Selecione pelo menos um ingresso.');
         }
 
         try {
@@ -71,7 +71,7 @@ class CheckoutController extends Controller
 
         if ($order->isExpired()) {
             return redirect()->route('event.show', $order->event->slug)
-                ->with('error', 'Your payment session expired. Please select your tickets again.');
+                ->with('error', 'Sua sessão de pagamento expirou. Por favor, selecione seus ingressos novamente.');
         }
 
         $order->load('event.customFields', 'items.ticketType');
@@ -88,7 +88,7 @@ class CheckoutController extends Controller
 
         if ($order->isExpired()) {
             return redirect()->route('event.show', $order->event->slug)
-                ->with('error', 'Your payment session expired. Please select your tickets again.');
+                ->with('error', 'Sua sessão de pagamento expirou. Por favor, selecione seus ingressos novamente.');
         }
 
         $validated = $request->validate([
@@ -130,7 +130,7 @@ class CheckoutController extends Controller
 
         if ($order->isExpired()) {
             return redirect()->route('event.show', $order->event->slug)
-                ->with('error', 'Your payment session expired. Please select your tickets again.');
+                ->with('error', 'Sua sessão de pagamento expirou. Por favor, selecione seus ingressos novamente.');
         }
 
         if ($order->status === OrderStatus::PAID) {
@@ -148,7 +148,7 @@ class CheckoutController extends Controller
 
         if ($order->isExpired()) {
             return redirect()->route('event.show', $order->event->slug)
-                ->with('error', 'Your payment session expired. Please select your tickets again.');
+                ->with('error', 'Sua sessão de pagamento expirou. Por favor, selecione seus ingressos novamente.');
         }
 
         $validated = $request->validate([

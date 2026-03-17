@@ -51,7 +51,9 @@ class EventService
         abort_if($event->status !== EventStatus::DRAFT, 422, 'Somente eventos em rascunho podem ser publicados.');
         abort_if($event->ticketTypes()->count() === 0, 422, 'O evento precisa ter pelo menos um tipo de ingresso antes de ser publicado.');
 
-        $this->organizerService->ensureAsaasAccount($event->organizer);
+        if (config('asaas.api_key')) {
+            $this->organizerService->ensureAsaasAccount($event->organizer);
+        }
 
         $event->update(['status' => EventStatus::PUBLISHED]);
 

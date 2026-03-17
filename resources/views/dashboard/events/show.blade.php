@@ -178,10 +178,9 @@
                                             {{ $type->quantity }}
                                         </td>
                                         <td class="px-6 py-4">
-                                            @php $remaining = $type->quantity - $type->sold_count; @endphp
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium
-                                                {{ $remaining > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
-                                                {{ $remaining }}
+                                                {{ $type->available > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                                                {{ $type->available }}
                                             </span>
                                         </td>
                                     </tr>

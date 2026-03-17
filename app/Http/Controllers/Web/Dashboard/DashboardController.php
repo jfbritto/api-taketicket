@@ -63,6 +63,6 @@ class DashboardController extends Controller
         $dto = CreateOrganizerDTO::fromRequest($validated);
         $organizerService->createOrganizer($request->user(), $dto);
 
-        return redirect('/dashboard')->with('success', 'Organizer profile created!');
+        return redirect('/dashboard')->with('success', 'Perfil de organizador criado com sucesso!');
     }
 }
