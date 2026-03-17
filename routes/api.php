@@ -3,9 +3,11 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CustomFieldController;
 use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\OrganizerController;
 use App\Http\Controllers\API\OrganizerEventController;
 use App\Http\Controllers\API\TicketTypeController;
+use App\Http\Controllers\API\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -50,4 +52,14 @@ Route::prefix('v1')->group(function () {
         Route::put('custom-fields/{customField}', [CustomFieldController::class, 'update']);
         Route::delete('custom-fields/{customField}', [CustomFieldController::class, 'destroy']);
     });
+
+    // Orders
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('orders', [OrderController::class, 'store']);
+        Route::get('orders/my', [OrderController::class, 'myOrders']);
+        Route::get('orders/{order}', [OrderController::class, 'show']);
+    });
+
+    // Webhooks (public, no auth)
+    Route::post('webhooks/asaas', [WebhookController::class, 'asaas']);
 });
