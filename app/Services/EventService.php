@@ -48,8 +48,8 @@ class EventService
 
     public function publishEvent(Event $event): Event
     {
-        abort_if($event->status !== EventStatus::DRAFT, 422, 'Only draft events can be published');
-        abort_if($event->ticketTypes()->count() === 0, 422, 'Event must have at least one ticket type');
+        abort_if($event->status !== EventStatus::DRAFT, 422, 'Somente eventos em rascunho podem ser publicados.');
+        abort_if($event->ticketTypes()->count() === 0, 422, 'O evento precisa ter pelo menos um tipo de ingresso antes de ser publicado.');
 
         $this->organizerService->ensureAsaasAccount($event->organizer);
 
@@ -63,7 +63,7 @@ class EventService
         abort_if(
             $event->orders()->where('status', OrderStatus::PAID)->exists(),
             422,
-            'Cannot cancel event with paid orders'
+            'Não é possível cancelar um evento com pedidos pagos.'
         );
 
         $event->update(['status' => EventStatus::CANCELLED]);

@@ -1,37 +1,37 @@
-<x-layouts.dashboard header="Events">
+<x-layouts.dashboard header="Eventos">
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-semibold text-gray-800">My Events</h2>
+        <h2 class="text-xl font-semibold text-gray-800">Meus Eventos</h2>
         <a href="{{ route('dashboard.events.create') }}"
            class="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-            + Create Event
+            + Criar Evento
         </a>
     </div>
 
     {{-- Status filter --}}
     <form method="GET" action="{{ route('dashboard.events') }}" class="mb-6 flex items-center gap-3">
-        <label for="status" class="text-sm font-medium text-gray-700">Filter by status:</label>
+        <label for="status" class="text-sm font-medium text-gray-700">Filtrar por status:</label>
         <select name="status" id="status" onchange="this.form.submit()"
                 class="rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border text-sm">
-            <option value="">All</option>
-            <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-            <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>Published</option>
-            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+            <option value="">Todos</option>
+            <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Rascunho</option>
+            <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>Publicado</option>
+            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelado</option>
         </select>
     </form>
 
     <x-card>
         @if($events->isEmpty())
-            <p class="text-gray-500">No events yet. <a href="{{ route('dashboard.events.create') }}" class="text-indigo-600 hover:underline">Create your first event.</a></p>
+            <p class="text-gray-500">Nenhum evento ainda. <a href="{{ route('dashboard.events.create') }}" class="text-indigo-600 hover:underline">Crie seu primeiro evento.</a></p>
         @else
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="text-left text-gray-500 border-b">
                         <tr>
-                            <th class="pb-3 font-medium">Title</th>
-                            <th class="pb-3 font-medium">Date</th>
+                            <th class="pb-3 font-medium">Título</th>
+                            <th class="pb-3 font-medium">Data</th>
                             <th class="pb-3 font-medium">Status</th>
-                            <th class="pb-3 font-medium">Sold</th>
-                            <th class="pb-3 font-medium">Actions</th>
+                            <th class="pb-3 font-medium">Vendidos</th>
+                            <th class="pb-3 font-medium">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -40,13 +40,16 @@
                                 <td class="py-3 font-medium text-gray-900">{{ $event->title }}</td>
                                 <td class="py-3 text-gray-600">{{ $event->start_date->format('d/m/Y H:i') }}</td>
                                 <td class="py-3">
-                                    <x-badge :type="$event->status->value">{{ ucfirst($event->status->value) }}</x-badge>
+                                    @php
+                                        $statusLabels = ['draft' => 'Rascunho', 'published' => 'Publicado', 'cancelled' => 'Cancelado'];
+                                    @endphp
+                                    <x-badge :type="$event->status->value">{{ $statusLabels[$event->status->value] ?? $event->status->value }}</x-badge>
                                 </td>
                                 <td class="py-3 text-gray-600">{{ $event->orders_count ?? 0 }}</td>
                                 <td class="py-3">
                                     <div class="flex items-center gap-2">
                                         <a href="{{ route('dashboard.events.edit', $event) }}"
-                                           class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Edit</a>
+                                           class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Editar</a>
 
                                         @if($event->status->value === 'draft')
                                             <form method="POST" action="{{ route('dashboard.events.publish', $event) }}" class="inline">
@@ -54,7 +57,7 @@
                                                 @method('PATCH')
                                                 <button type="submit"
                                                         class="text-green-600 hover:text-green-800 text-xs font-medium">
-                                                    Publish
+                                                    Publicar
                                                 </button>
                                             </form>
                                         @endif
@@ -64,9 +67,9 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit"
-                                                        onclick="return confirm('Cancel this event?')"
+                                                        onclick="return confirm('Tem certeza que deseja cancelar este evento?')"
                                                         class="text-red-600 hover:text-red-800 text-xs font-medium">
-                                                    Cancel
+                                                    Cancelar
                                                 </button>
                                             </form>
                                         @endif
