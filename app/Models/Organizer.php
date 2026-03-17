@@ -16,6 +16,13 @@ class Organizer extends Model
         'asaas_account_id',
     ];
 
-    public function user() { return $this->belongsTo(User::class); }
-    public function events() { return $this->hasMany(Event::class); }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }

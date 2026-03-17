@@ -11,10 +11,11 @@ class OrganizerFactory extends Factory
     public function definition(): array
     {
         $name = fake()->company();
+
         return [
             'user_id' => User::factory(),
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 99999),
+            'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(1, 99999),
             'description' => fake()->paragraph(),
             'document' => fake()->numerify('###########'),
             'phone' => fake()->phoneNumber(),

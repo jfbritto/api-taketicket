@@ -28,6 +28,7 @@ class TicketService
     public function generateQrPayload(Ticket $ticket): string
     {
         $hmac = hash_hmac('sha256', (string) $ticket->id, config('app.key'));
+
         return "{$ticket->id}:{$hmac}";
     }
 
@@ -39,12 +40,16 @@ class TicketService
     public function validateQrPayload(string $payload): ?Ticket
     {
         $parts = explode(':', $payload, 2);
-        if (count($parts) !== 2) return null;
+        if (count($parts) !== 2) {
+            return null;
+        }
 
         [$ticketId, $hmac] = $parts;
         $expectedHmac = hash_hmac('sha256', $ticketId, config('app.key'));
 
-        if (!hash_equals($expectedHmac, $hmac)) return null;
+        if (! hash_equals($expectedHmac, $hmac)) {
+            return null;
+        }
 
         return Ticket::with('participant')->find($ticketId);
     }

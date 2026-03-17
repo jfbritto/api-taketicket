@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Enums\TicketStatus;
-use App\Models\Checkin;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\OrderItem;

@@ -19,12 +19,20 @@ class TicketType extends Model
         return ['price' => 'decimal:2', 'sale_start' => 'datetime', 'sale_end' => 'datetime'];
     }
 
-    public function event() { return $this->belongsTo(Event::class); }
-    public function orderItems() { return $this->hasMany(OrderItem::class); }
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 
     public function isOnSale(): bool
     {
         $now = now();
+
         return $now->between($this->sale_start, $this->sale_end) && $this->available > 0;
     }
 }

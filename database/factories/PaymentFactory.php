@@ -14,7 +14,7 @@ class PaymentFactory extends Factory
     {
         return [
             'order_id' => Order::factory(),
-            'asaas_id' => 'pay_' . Str::random(20),
+            'asaas_id' => 'pay_'.Str::random(20),
             'status' => PaymentStatus::PENDING,
             'billing_type' => BillingType::PIX,
             'amount' => fake()->randomFloat(2, 50, 1000),

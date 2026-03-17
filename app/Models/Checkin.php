@@ -16,6 +16,13 @@ class Checkin extends Model
         return ['checked_at' => 'datetime'];
     }
 
-    public function ticket() { return $this->belongsTo(Ticket::class); }
-    public function checkedByUser() { return $this->belongsTo(User::class, 'checked_by'); }
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
+
+    public function checkedByUser()
+    {
+        return $this->belongsTo(User::class, 'checked_by');
+    }
 }

@@ -10,6 +10,7 @@ class TicketTypeFactory extends Factory
     public function definition(): array
     {
         $quantity = fake()->numberBetween(50, 500);
+
         return [
             'event_id' => Event::factory(),
             'name' => fake()->randomElement(['Standard', 'VIP', 'Premium', 'Corrida 5km', 'Corrida 10km']),

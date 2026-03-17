@@ -16,9 +16,13 @@ class PolicyTest extends TestCase
     use RefreshDatabase;
 
     private User $ownerUser;
+
     private Organizer $ownerOrganizer;
+
     private Event $event;
+
     private User $intruderUser;
+
     private Organizer $intruderOrganizer;
 
     protected function setUp(): void

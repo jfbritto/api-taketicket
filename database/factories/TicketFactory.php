@@ -17,7 +17,7 @@ class TicketFactory extends Factory
             'event_id' => Event::factory(),
             'ticket_type_id' => TicketType::factory(),
             'order_item_id' => OrderItem::factory(),
-            'ticket_code' => 'TKT-' . strtoupper(Str::random(6)),
+            'ticket_code' => 'TKT-'.strtoupper(Str::random(6)),
             'qr_code_payload' => Str::random(64),
             'status' => TicketStatus::VALID,
         ];

@@ -26,10 +26,33 @@ class Event extends Model
         ];
     }
 
-    public function slugSource(): string { return 'title'; }
-    public function organizer() { return $this->belongsTo(Organizer::class); }
-    public function ticketTypes() { return $this->hasMany(TicketType::class); }
-    public function customFields() { return $this->hasMany(CustomField::class)->orderBy('position'); }
-    public function orders() { return $this->hasMany(Order::class); }
-    public function tickets() { return $this->hasMany(Ticket::class); }
+    public function slugSource(): string
+    {
+        return 'title';
+    }
+
+    public function organizer()
+    {
+        return $this->belongsTo(Organizer::class);
+    }
+
+    public function ticketTypes()
+    {
+        return $this->hasMany(TicketType::class);
+    }
+
+    public function customFields()
+    {
+        return $this->hasMany(CustomField::class)->orderBy('position');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

@@ -10,7 +10,7 @@ class GenerateTicketCode
     public function execute(): string
     {
         do {
-            $code = 'TKT-' . strtoupper(Str::random(6));
+            $code = 'TKT-'.strtoupper(Str::random(6));
         } while (Ticket::where('ticket_code', $code)->exists());
 
         return $code;

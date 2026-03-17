@@ -16,7 +16,7 @@ class CheckinService
             ? $this->ticketService->validateQrPayload($input)
             : $this->ticketService->validateTicket($input);
 
-        if (!$ticket) {
+        if (! $ticket) {
             return ['status' => 'invalid'];
         }
 

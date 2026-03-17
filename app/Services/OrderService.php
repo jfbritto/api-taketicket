@@ -10,9 +10,11 @@ use App\Enums\TicketStatus;
 use App\Exceptions\InsufficientStockException;
 use App\Jobs\GenerateTicketsJob;
 use App\Models\Order;
+use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -37,7 +39,7 @@ class OrderService
                 }
 
                 // Check sales window
-                abort_if(!$ticketType->isOnSale(), 422, "Ticket type '{$ticketType->name}' is not on sale");
+                abort_if(! $ticketType->isOnSale(), 422, "Ticket type '{$ticketType->name}' is not on sale");
 
                 // Check max per user
                 abort_if(
@@ -80,11 +82,11 @@ class OrderService
 
                 // Create tickets and participants
                 foreach ($itemData['participants'] as $participantData) {
-                    $ticket = \App\Models\Ticket::create([
+                    $ticket = Ticket::create([
                         'event_id' => $order->event_id,
                         'ticket_type_id' => $itemData['ticketType']->id,
                         'order_item_id' => $orderItem->id,
-                        'ticket_code' => 'PENDING-' . \Illuminate\Support\Str::uuid(), // Generated after payment
+                        'ticket_code' => 'PENDING-'.Str::uuid(), // Generated after payment
                         'qr_code_payload' => '', // Generated after payment
                         'status' => TicketStatus::VALID,
                     ]);
@@ -119,7 +121,7 @@ class OrderService
             }
 
             // Cancel tickets
-            \App\Models\Ticket::whereIn('order_item_id', $order->items->pluck('id'))
+            Ticket::whereIn('order_item_id', $order->items->pluck('id'))
                 ->update(['status' => TicketStatus::CANCELLED]);
         });
     }

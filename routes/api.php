@@ -1,15 +1,15 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CheckinController;
 use App\Http\Controllers\API\CustomFieldController;
+use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\OrganizerController;
 use App\Http\Controllers\API\OrganizerEventController;
-use App\Http\Controllers\API\TicketTypeController;
-use App\Http\Controllers\API\CheckinController;
-use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\TicketController;
+use App\Http\Controllers\API\TicketTypeController;
 use App\Http\Controllers\API\WebhookController;
 use Illuminate\Support\Facades\Route;
 

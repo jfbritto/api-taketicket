@@ -12,7 +12,7 @@ class WebhookController extends Controller
 {
     public function asaas(Request $request, AsaasService $asaasService): JsonResponse
     {
-        if (!$asaasService->verifyWebhookToken($request)) {
+        if (! $asaasService->verifyWebhookToken($request)) {
             abort(401);
         }
 

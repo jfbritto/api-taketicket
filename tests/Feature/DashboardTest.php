@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\OrderStatus;
 use App\Enums\TicketStatus;
 use App\Models\Event;
 use App\Models\Order;

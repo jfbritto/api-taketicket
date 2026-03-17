@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Event;
 use App\Models\Order;
 use App\Models\Organizer;
 use App\Models\Payment;
 use App\Models\User;
 use App\Services\AsaasService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -43,7 +45,7 @@ class AsaasServiceTest extends TestCase
         $organizer = Organizer::factory()->create(['asaas_account_id' => 'acc_123']);
         $order = Order::factory()->create([
             'user_id' => User::factory(),
-            'event_id' => \App\Models\Event::factory()->create(['organizer_id' => $organizer->id])->id,
+            'event_id' => Event::factory()->create(['organizer_id' => $organizer->id])->id,
             'total_amount' => 100,
             'platform_fee' => 5,
             'organizer_amount' => 95,
@@ -56,6 +58,7 @@ class AsaasServiceTest extends TestCase
         $this->assertEquals('pay_123', $result['id']);
         Http::assertSent(function ($request) {
             $body = $request->data();
+
             return isset($body['split']) && $body['value'] == 100;
         });
     }
@@ -65,11 +68,11 @@ class AsaasServiceTest extends TestCase
         config(['asaas.webhook_token' => 'test_token_123']);
         $service = app(AsaasService::class);
 
-        $validRequest = \Illuminate\Http\Request::create('/webhook', 'POST');
+        $validRequest = Request::create('/webhook', 'POST');
         $validRequest->headers->set('asaas-access-token', 'test_token_123');
         $this->assertTrue($service->verifyWebhookToken($validRequest));
 
-        $invalidRequest = \Illuminate\Http\Request::create('/webhook', 'POST');
+        $invalidRequest = Request::create('/webhook', 'POST');
         $invalidRequest->headers->set('asaas-access-token', 'wrong_token');
         $this->assertFalse($service->verifyWebhookToken($invalidRequest));
     }

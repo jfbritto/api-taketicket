@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Organizer;
 use App\Models\Order;
+use App\Models\Organizer;
 use App\Models\Payment;
 use App\Support\AsaasClient;
 use Illuminate\Http\Request;
@@ -52,6 +52,7 @@ class AsaasService
     public function verifyWebhookToken(Request $request): bool
     {
         $token = $request->header('asaas-access-token');
+
         return $token === config('asaas.webhook_token');
     }
 }

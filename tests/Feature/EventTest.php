@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Enums\EventStatus;
 use App\Models\Event;
 use App\Models\Organizer;
-use App\Models\TicketType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,6 +17,7 @@ class EventTest extends TestCase
     {
         $user = User::factory()->create();
         $organizer = Organizer::factory()->create(['user_id' => $user->id]);
+
         return [$user, $organizer];
     }
 

@@ -14,6 +14,7 @@ class CustomFieldController extends Controller
     public function index(Event $event): JsonResponse
     {
         $this->authorize('manage', $event);
+
         return response()->json($event->customFields);
     }
 
@@ -21,6 +22,7 @@ class CustomFieldController extends Controller
     {
         $this->authorize('manage', $event);
         $field = $event->customFields()->create($request->validated());
+
         return response()->json($field, 201);
     }
 
@@ -30,6 +32,7 @@ class CustomFieldController extends Controller
         abort_unless($customField->event_id === $event->id, 404);
 
         $customField->update($request->validated());
+
         return response()->json($customField->fresh());
     }
 
@@ -40,6 +43,7 @@ class CustomFieldController extends Controller
         abort_if($customField->hasValues(), 422, 'Cannot delete field with existing values');
 
         $customField->delete();
+
         return response()->json(null, 204);
     }
 }

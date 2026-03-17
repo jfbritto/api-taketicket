@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Enums\EventStatus;
 use App\Enums\OrderStatus;
-use App\Enums\TicketStatus;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\Organizer;
@@ -153,7 +152,7 @@ class OrderTest extends TestCase
     public function test_can_list_my_orders(): void
     {
         $user = User::factory()->create();
-        \App\Models\Order::factory()->count(3)->create(['user_id' => $user->id]);
+        Order::factory()->count(3)->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)->getJson('/api/v1/orders/my');
 
@@ -334,5 +333,4 @@ class OrderTest extends TestCase
         $myTicketsResponse = $this->actingAs($buyerUser)->getJson('/api/v1/tickets/my');
         $myTicketsResponse->assertOk();
     }
-
 }

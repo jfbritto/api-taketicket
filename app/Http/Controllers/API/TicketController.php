@@ -14,8 +14,8 @@ class TicketController extends Controller
     public function myTickets(Request $request): JsonResponse
     {
         $tickets = Ticket::whereHas('orderItem.order', function ($query) use ($request) {
-                $query->where('user_id', $request->user()->id);
-            })
+            $query->where('user_id', $request->user()->id);
+        })
             ->where('status', '!=', TicketStatus::CANCELLED)
             ->with('participant', 'event', 'ticketType')
             ->latest()

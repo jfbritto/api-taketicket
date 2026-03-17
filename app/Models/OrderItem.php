@@ -16,7 +16,18 @@ class OrderItem extends Model
         return ['unit_price' => 'decimal:2'];
     }
 
-    public function order() { return $this->belongsTo(Order::class); }
-    public function ticketType() { return $this->belongsTo(TicketType::class); }
-    public function tickets() { return $this->hasMany(Ticket::class); }
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function ticketType()
+    {
+        return $this->belongsTo(TicketType::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

@@ -11,6 +11,13 @@ class ParticipantFieldValue extends Model
 
     protected $fillable = ['participant_id', 'custom_field_id', 'value'];
 
-    public function participant() { return $this->belongsTo(Participant::class); }
-    public function customField() { return $this->belongsTo(CustomField::class); }
+    public function participant()
+    {
+        return $this->belongsTo(Participant::class);
+    }
+
+    public function customField()
+    {
+        return $this->belongsTo(CustomField::class);
+    }
 }

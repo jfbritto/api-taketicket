@@ -17,7 +17,18 @@ class CustomField extends Model
         return ['type' => CustomFieldType::class, 'required' => 'boolean', 'options' => 'array'];
     }
 
-    public function event() { return $this->belongsTo(Event::class); }
-    public function values() { return $this->hasMany(ParticipantFieldValue::class); }
-    public function hasValues(): bool { return $this->values()->exists(); }
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function values()
+    {
+        return $this->hasMany(ParticipantFieldValue::class);
+    }
+
+    public function hasValues(): bool
+    {
+        return $this->values()->exists();
+    }
 }

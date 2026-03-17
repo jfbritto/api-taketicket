@@ -35,13 +35,19 @@ class PaymentService
         $asaasId = $payload['payment']['id'] ?? null;
         $eventType = $payload['event'] ?? null;
 
-        if (!$asaasId) return;
+        if (! $asaasId) {
+            return;
+        }
 
         $payment = Payment::where('asaas_id', $asaasId)->first();
-        if (!$payment) return;
+        if (! $payment) {
+            return;
+        }
 
         // Idempotency: skip if payment is already terminal
-        if ($payment->status->isTerminal()) return;
+        if ($payment->status->isTerminal()) {
+            return;
+        }
 
         $newStatus = match ($eventType) {
             'PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED' => PaymentStatus::CONFIRMED,
@@ -50,7 +56,9 @@ class PaymentService
             default => null,
         };
 
-        if (!$newStatus) return;
+        if (! $newStatus) {
+            return;
+        }
 
         $payment->update([
             'status' => $newStatus,
@@ -67,7 +75,7 @@ class PaymentService
 
     public function getPixQrCode(Payment $payment): ?array
     {
-        if (!$payment->asaas_id || $payment->billing_type !== BillingType::PIX) {
+        if (! $payment->asaas_id || $payment->billing_type !== BillingType::PIX) {
             return null;
         }
 

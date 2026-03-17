@@ -29,6 +29,7 @@ class TicketTypeController extends Controller
         abort_unless($ticketType->event_id === $event->id, 404);
 
         $ticketType->update($request->validated());
+
         return response()->json($ticketType->fresh());
     }
 
@@ -39,6 +40,7 @@ class TicketTypeController extends Controller
         abort_if($ticketType->orderItems()->exists(), 422, 'Cannot delete ticket type with sales');
 
         $ticketType->delete();
+
         return response()->json(null, 204);
     }
 }

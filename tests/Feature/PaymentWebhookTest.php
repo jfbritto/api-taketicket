@@ -9,12 +9,13 @@ use App\Models\Event;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Organizer;
+use App\Models\Participant;
 use App\Models\Payment;
 use App\Models\Ticket;
-use App\Models\Participant;
 use App\Models\TicketType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PaymentWebhookTest extends TestCase
@@ -48,7 +49,7 @@ class PaymentWebhookTest extends TestCase
             'event_id' => $event->id,
             'ticket_type_id' => $ticketType->id,
             'order_item_id' => $orderItem->id,
-            'ticket_code' => 'PENDING-' . \Illuminate\Support\Str::uuid(),
+            'ticket_code' => 'PENDING-'.Str::uuid(),
             'qr_code_payload' => '',
             'status' => TicketStatus::VALID,
         ]);

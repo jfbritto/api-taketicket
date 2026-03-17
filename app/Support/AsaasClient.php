@@ -18,6 +18,7 @@ class AsaasClient
         ])->post("{$this->apiUrl}{$endpoint}", $data);
 
         $response->throw();
+
         return $response->json();
     }
 
@@ -28,6 +29,7 @@ class AsaasClient
         ])->get("{$this->apiUrl}{$endpoint}");
 
         $response->throw();
+
         return $response->json();
     }
 }

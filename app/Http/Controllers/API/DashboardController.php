@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Enums\OrderStatus;
-use App\Enums\TicketStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DashboardSummaryResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Event;
 use App\Models\Participant;
-use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class DashboardController extends Controller
 {
@@ -35,7 +33,7 @@ class DashboardController extends Controller
             ->with(['ticket.ticketType', 'fieldValues.customField'])
             ->paginate(15);
 
-        return \Illuminate\Http\Resources\Json\JsonResource::collection($participants);
+        return JsonResource::collection($participants);
     }
 
     public function tickets(Request $request, Event $event): AnonymousResourceCollection
@@ -46,7 +44,7 @@ class DashboardController extends Controller
             ->with(['participant', 'ticketType'])
             ->paginate(15);
 
-        return \Illuminate\Http\Resources\Json\JsonResource::collection($tickets);
+        return JsonResource::collection($tickets);
     }
 
     public function summary(Request $request, Event $event): DashboardSummaryResource

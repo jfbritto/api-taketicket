@@ -23,6 +23,7 @@ class OrganizerEventController extends Controller
         abort_unless($organizer, 403, 'User is not an organizer');
 
         $events = $organizer->events()->latest()->paginate(15);
+
         return response()->json(EventResource::collection($events)->response()->getData(true));
     }
 
@@ -40,6 +41,7 @@ class OrganizerEventController extends Controller
     public function show(Request $request, Event $event): JsonResponse
     {
         $this->authorize('manage', $event);
+
         return response()->json(new EventDetailResource($event->load('ticketTypes', 'customFields')));
     }
 
@@ -48,6 +50,7 @@ class OrganizerEventController extends Controller
         $this->authorize('manage', $event);
         $dto = CreateEventDTO::fromRequest($request->validated());
         $event = $this->eventService->updateEvent($event, $dto);
+
         return response()->json(new EventDetailResource($event));
     }
 
@@ -55,6 +58,7 @@ class OrganizerEventController extends Controller
     {
         $this->authorize('manage', $event);
         $event = $this->eventService->publishEvent($event);
+
         return response()->json(new EventDetailResource($event));
     }
 
@@ -62,6 +66,7 @@ class OrganizerEventController extends Controller
     {
         $this->authorize('manage', $event);
         $event = $this->eventService->cancelEvent($event);
+
         return response()->json(new EventDetailResource($event));
     }
 }

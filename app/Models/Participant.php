@@ -19,6 +19,13 @@ class Participant extends Model
         return ['birth_date' => 'date', 'gender' => Gender::class];
     }
 
-    public function ticket() { return $this->belongsTo(Ticket::class); }
-    public function fieldValues() { return $this->hasMany(ParticipantFieldValue::class); }
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
+
+    public function fieldValues()
+    {
+        return $this->hasMany(ParticipantFieldValue::class);
+    }
 }

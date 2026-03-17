@@ -20,9 +20,28 @@ class Ticket extends Model
         return ['status' => TicketStatus::class, 'checked_in_at' => 'datetime'];
     }
 
-    public function event() { return $this->belongsTo(Event::class); }
-    public function ticketType() { return $this->belongsTo(TicketType::class); }
-    public function orderItem() { return $this->belongsTo(OrderItem::class); }
-    public function participant() { return $this->hasOne(Participant::class); }
-    public function checkins() { return $this->hasMany(Checkin::class); }
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function ticketType()
+    {
+        return $this->belongsTo(TicketType::class);
+    }
+
+    public function orderItem()
+    {
+        return $this->belongsTo(OrderItem::class);
+    }
+
+    public function participant()
+    {
+        return $this->hasOne(Participant::class);
+    }
+
+    public function checkins()
+    {
+        return $this->hasMany(Checkin::class);
+    }
 }

@@ -19,6 +19,7 @@ class TicketTypeTest extends TestCase
         $user = User::factory()->create();
         $organizer = Organizer::factory()->create(['user_id' => $user->id]);
         $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+
         return [$user, $event];
     }
 

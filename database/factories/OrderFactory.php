@@ -13,6 +13,7 @@ class OrderFactory extends Factory
     {
         $totalAmount = fake()->randomFloat(2, 50, 1000);
         $platformFee = round($totalAmount * 0.05, 2);
+
         return [
             'user_id' => User::factory(),
             'event_id' => Event::factory(),
@@ -24,6 +25,13 @@ class OrderFactory extends Factory
         ];
     }
 
-    public function paid(): static { return $this->state(['status' => OrderStatus::PAID]); }
-    public function awaitingPayment(): static { return $this->state(['status' => OrderStatus::AWAITING_PAYMENT]); }
+    public function paid(): static
+    {
+        return $this->state(['status' => OrderStatus::PAID]);
+    }
+
+    public function awaitingPayment(): static
+    {
+        return $this->state(['status' => OrderStatus::AWAITING_PAYMENT]);
+    }
 }

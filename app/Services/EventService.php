@@ -54,6 +54,7 @@ class EventService
         $this->organizerService->ensureAsaasAccount($event->organizer);
 
         $event->update(['status' => EventStatus::PUBLISHED]);
+
         return $event->fresh();
     }
 
@@ -66,6 +67,7 @@ class EventService
         );
 
         $event->update(['status' => EventStatus::CANCELLED]);
+
         return $event->fresh();
     }
 }

@@ -12,10 +12,11 @@ class EventFactory extends Factory
     public function definition(): array
     {
         $title = fake()->sentence(3);
+
         return [
             'organizer_id' => Organizer::factory(),
             'title' => $title,
-            'slug' => Str::slug($title) . '-' . fake()->unique()->numberBetween(1, 99999),
+            'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(1, 99999),
             'description' => fake()->paragraphs(2, true),
             'location' => fake()->company(),
             'address' => fake()->streetAddress(),
