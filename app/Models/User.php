@@ -29,4 +29,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    public function collaborations()
+    {
+        return $this->hasMany(EventCollaborator::class);
+    }
 }

@@ -55,4 +55,9 @@ class Event extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function collaborators()
+    {
+        return $this->hasMany(EventCollaborator::class);
+    }
 }
