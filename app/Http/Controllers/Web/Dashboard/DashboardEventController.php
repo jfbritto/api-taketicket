@@ -28,9 +28,21 @@ class DashboardEventController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('search')) {
+            $query->where(fn ($q) => $q
+                ->where('title', 'like', '%' . $request->search . '%')
+                ->orWhere('city', 'like', '%' . $request->search . '%')
+                ->orWhere('location', 'like', '%' . $request->search . '%')
+            );
+        }
+
         $events = $query->latest()->paginate(15);
 
-        return view('dashboard.events.index', compact('events'));
+        $totalEvents    = $organizer->events()->count();
+        $publishedCount = $organizer->events()->where('status', 'published')->count();
+        $upcomingCount  = $organizer->events()->where('status', 'published')->where('start_date', '>', now())->count();
+
+        return view('dashboard.events.index', compact('events', 'totalEvents', 'publishedCount', 'upcomingCount'));
     }
 
     public function show(Request $request, Event $event): View
@@ -101,6 +113,19 @@ class DashboardEventController extends Controller
             'start_date' => 'required|date|after:now',
             'end_date' => 'nullable|date|after:start_date',
             'banner' => 'nullable|image|max:2048',
+            // Ticket types
+            'ticket_types' => 'nullable|array',
+            'ticket_types.*.name' => 'required|string|max:255',
+            'ticket_types.*.price' => 'required|numeric|min:0',
+            'ticket_types.*.quantity' => 'required|integer|min:1',
+            'ticket_types.*.sale_start' => 'required|date',
+            'ticket_types.*.sale_end' => 'required|date|after:ticket_types.*.sale_start',
+            // Custom fields
+            'custom_fields' => 'nullable|array',
+            'custom_fields.*.label' => 'required|string|max:255',
+            'custom_fields.*.type' => 'required|in:text,number,select,checkbox',
+            'custom_fields.*.required' => 'nullable|boolean',
+            'custom_fields.*.options' => 'nullable|string',
         ]);
 
         if ($request->hasFile('banner')) {
@@ -108,9 +133,34 @@ class DashboardEventController extends Controller
         }
 
         $dto = CreateEventDTO::fromRequest($validated);
-        $this->eventService->createEvent($request->user()->organizer, $dto);
+        $event = $this->eventService->createEvent($request->user()->organizer, $dto);
 
-        return redirect()->route('dashboard.events')->with('success', 'Evento criado como rascunho.');
+        foreach ($validated['ticket_types'] ?? [] as $ttData) {
+            TicketType::create([
+                'event_id' => $event->id,
+                'name' => $ttData['name'],
+                'price' => $ttData['price'],
+                'quantity' => $ttData['quantity'],
+                'available' => $ttData['quantity'],
+                'sale_start' => $ttData['sale_start'],
+                'sale_end' => $ttData['sale_end'],
+            ]);
+        }
+
+        foreach ($validated['custom_fields'] ?? [] as $index => $cfData) {
+            CustomField::create([
+                'event_id' => $event->id,
+                'label' => $cfData['label'],
+                'type' => $cfData['type'],
+                'required' => $cfData['required'] ?? false,
+                'options' => $cfData['type'] === 'select' && ! empty($cfData['options'])
+                    ? array_map('trim', explode(',', $cfData['options']))
+                    : null,
+                'position' => $index,
+            ]);
+        }
+
+        return redirect()->route('dashboard.events.edit', $event)->with('success', 'Evento criado com sucesso!');
     }
 
     public function edit(Request $request, Event $event): View

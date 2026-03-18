@@ -146,10 +146,117 @@
         {{ $slot }}
     </main>
 
-    <footer class="bg-white border-t py-8 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
-            &copy; {{ date('Y') }} TakeTicket. Todos os direitos reservados.
+    <footer style="background:#0f172a;margin-top:auto;">
+
+        {{-- Main footer content --}}
+        <div style="max-width:1100px;margin:0 auto;padding:56px 24px 40px;display:grid;grid-template-columns:2fr 1.5fr 1fr;gap:48px;">
+
+            {{-- Column 1: Brand + description --}}
+            <div>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                        </svg>
+                    </div>
+                    <span style="font-size:17px;font-weight:800;color:white;letter-spacing:-0.3px;">TakeTicket</span>
+                </div>
+                <p style="font-size:13.5px;color:rgba(148,163,184,0.9);line-height:1.7;margin:0 0 20px;max-width:320px;">
+                    Plataforma de venda e gestão de ingressos para eventos de todos os tamanhos. Simples para o organizador, ágil para o participante.
+                </p>
+                <a href="https://helpflux.com.br/" target="_blank" rel="noopener"
+                   style="font-size:12.5px;color:rgba(148,163,184,0.5);text-decoration:none;display:inline-flex;align-items:center;gap:5px;"
+                   onmouseover="this.style.color='rgba(148,163,184,0.9)'" onmouseout="this.style.color='rgba(148,163,184,0.5)'">
+                    Um produto
+                    <span style="color:rgba(148,163,184,0.85);font-weight:700;">HelpFlux</span>
+                    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                </a>
+            </div>
+
+            {{-- Column 2: Company info --}}
+            <div>
+                <p style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin:0 0 16px;">Empresa</p>
+                <p style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85);margin:0 0 8px;line-height:1.4;">HELPFLUX SOLUÇÕES EM TECNOLOGIA LTDA</p>
+                <p style="font-size:13px;color:rgba(148,163,184,0.7);margin:0 0 4px;">CNPJ: 58.063.432/0001-21</p>
+                <p style="font-size:13px;color:rgba(148,163,184,0.7);margin:0 0 20px;">Santa Maria de Jetibá – ES</p>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <a href="mailto:helpflux.atendimento@gmail.com"
+                       style="font-size:13px;color:rgba(148,163,184,0.7);text-decoration:none;display:inline-flex;align-items:center;gap:6px;"
+                       onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.7)'">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        helpflux.atendimento@gmail.com
+                    </a>
+                    <a href="tel:+5528999743099"
+                       style="font-size:13px;color:rgba(148,163,184,0.7);text-decoration:none;display:inline-flex;align-items:center;gap:6px;"
+                       onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.7)'">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                        (28) 99974-3099
+                    </a>
+                    <a href="https://helpflux.com.br/" target="_blank" rel="noopener"
+                       style="font-size:13px;color:rgba(148,163,184,0.7);text-decoration:none;display:inline-flex;align-items:center;gap:6px;"
+                       onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.7)'">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/>
+                        </svg>
+                        helpflux.com.br
+                    </a>
+                </div>
+            </div>
+
+            {{-- Column 3: Navigation --}}
+            <div>
+                <p style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin:0 0 16px;">TakeTicket</p>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <a href="{{ route('home') }}"
+                       style="font-size:13.5px;color:rgba(148,163,184,0.8);text-decoration:none;"
+                       onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.8)'">Explorar Eventos</a>
+                    @auth
+                        <a href="{{ route('my-tickets') }}"
+                           style="font-size:13.5px;color:rgba(148,163,184,0.8);text-decoration:none;"
+                           onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.8)'">Meus Ingressos</a>
+                        <a href="{{ url('/dashboard') }}"
+                           style="font-size:13.5px;color:rgba(148,163,184,0.8);text-decoration:none;"
+                           onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.8)'">Painel do Organizador</a>
+                    @else
+                        <a href="{{ route('login') }}"
+                           style="font-size:13.5px;color:rgba(148,163,184,0.8);text-decoration:none;"
+                           onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.8)'">Entrar</a>
+                        <a href="{{ route('register') }}"
+                           style="font-size:13.5px;color:rgba(148,163,184,0.8);text-decoration:none;"
+                           onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.8)'">Criar conta</a>
+                    @endauth
+                </div>
+            </div>
+
         </div>
+
+        {{-- Bottom bar --}}
+        <div style="border-top:1px solid rgba(255,255,255,0.06);padding:20px 24px;">
+            <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                <p style="font-size:12.5px;color:rgba(148,163,184,0.5);margin:0;">
+                    &copy; {{ date('Y') }} TakeTicket. Todos os direitos reservados.
+                </p>
+                <div style="display:flex;align-items:center;gap:20px;">
+                    <a href="{{ route('terms') }}"
+                       style="font-size:12.5px;color:rgba(148,163,184,0.5);text-decoration:none;"
+                       onmouseover="this.style.color='rgba(148,163,184,0.9)'" onmouseout="this.style.color='rgba(148,163,184,0.5)'">
+                        Termos de Uso
+                    </a>
+                    <a href="{{ route('privacy') }}"
+                       style="font-size:12.5px;color:rgba(148,163,184,0.5);text-decoration:none;"
+                       onmouseover="this.style.color='rgba(148,163,184,0.9)'" onmouseout="this.style.color='rgba(148,163,184,0.5)'">
+                        Política de Privacidade
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/imask@7.6.1/dist/imask.min.js"></script>

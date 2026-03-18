@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Policies\EventPolicy;
 use App\Support\AsaasClient;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::defaultView('pagination::tailwind');
+
         Gate::policy(Event::class, EventPolicy::class);
 
         RateLimiter::for('api', function ($request) {

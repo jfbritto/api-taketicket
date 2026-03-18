@@ -24,6 +24,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('event/{slug}', [PublicEventController::class, 'show'])->name('event.show');
+Route::view('termos-de-uso', 'legal.terms')->name('terms');
+Route::view('politica-de-privacidade', 'legal.privacy')->name('privacy');
+
+// Redirects guest buyers to login keeping the event page as the intended return URL
+Route::get('comprar/entrar', function (\Illuminate\Http\Request $request) {
+    session(['url.intended' => $request->query('back', url('/'))]);
+    return redirect()->route('login', ['para' => 'ingresso']);
+})->name('buy.login');
 
 // Auth routes
 Route::middleware('guest')->group(function () {

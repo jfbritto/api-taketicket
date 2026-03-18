@@ -4,23 +4,22 @@
         <a href="{{ route('dashboard.events') }}" class="text-sm text-indigo-600 hover:underline">&larr; Voltar para Eventos</a>
     </div>
 
-    <form method="GET" action="{{ route('dashboard.tickets', $event) }}" class="mb-6 flex items-center gap-3">
+    <form id="tk-search-form" method="GET" action="{{ route('dashboard.tickets', $event) }}" class="mb-6 flex items-center gap-3">
         <input
+            id="tk-search-input"
             type="text"
             name="search"
             value="{{ request('search') }}"
             placeholder="Buscar por código do ingresso..."
+            autocomplete="off"
             class="rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border text-sm w-72"
         />
-        <button type="submit"
-                class="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm">
-            Buscar
-        </button>
         @if(request('search'))
             <a href="{{ route('dashboard.tickets', $event) }}" class="text-sm text-gray-500 hover:underline">Limpar</a>
         @endif
     </form>
 
+    <div id="tk-results-container" style="transition:opacity 0.15s;">
     <x-card>
         @if($tickets->isEmpty())
             <p class="text-gray-500">Nenhum ingresso encontrado.</p>
@@ -60,4 +59,38 @@
             </div>
         @endif
     </x-card>
+    </div>
+
+    @push('scripts')
+    <script>
+    (function () {
+        var form      = document.getElementById('tk-search-form');
+        var input     = document.getElementById('tk-search-input');
+        var container = document.getElementById('tk-results-container');
+        var timer;
+
+        function doSearch() {
+            var params = new URLSearchParams(new FormData(form));
+            container.style.opacity = '0.5';
+            fetch(form.action + '?' + params.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var fresh = doc.getElementById('tk-results-container');
+                if (fresh) container.innerHTML = fresh.innerHTML;
+                container.style.opacity = '1';
+                history.replaceState({}, '', form.action + '?' + params.toString());
+            })
+            .catch(function () { container.style.opacity = '1'; });
+        }
+
+        input.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(doSearch, 400);
+        });
+    })();
+    </script>
+    @endpush
 </x-layouts.dashboard>

@@ -263,12 +263,6 @@
 
             {{-- Invite form --}}
             <div class="px-6 py-4 border-b border-gray-100">
-                @if(session('success'))
-                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
-                        <p style="font-size:13px;color:#16a34a;margin:0;font-weight:500;">{{ session('success') }}</p>
-                    </div>
-                @endif
-
                 <form method="POST" action="{{ route('dashboard.collaborators.store', $event) }}" style="display:flex;gap:8px;align-items:flex-start;">
                     @csrf
                     <div style="flex:1;">

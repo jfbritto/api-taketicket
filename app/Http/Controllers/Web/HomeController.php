@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Web;
 
 use App\Enums\EventStatus;
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|\Illuminate\Http\JsonResponse
     {
         $query = Event::where('status', EventStatus::PUBLISHED)
             ->where('start_date', '>=', now())
@@ -35,6 +37,16 @@ class HomeController extends Controller
 
         $events = $query->paginate(12);
 
-        return view('public.home', compact('events'));
+        if ($request->boolean('_json')) {
+            return response()->json([
+                'html'    => view('public._event-cards', compact('events'))->render(),
+                'hasMore' => $events->hasMorePages(),
+            ]);
+        }
+
+        $totalEvents  = Event::where('status', EventStatus::PUBLISHED)->count();
+        $totalTickets = Order::where('status', OrderStatus::PAID)->count();
+
+        return view('public.home', compact('events', 'totalEvents', 'totalTickets'));
     }
 }

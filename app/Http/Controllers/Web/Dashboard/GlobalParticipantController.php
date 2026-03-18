@@ -32,7 +32,11 @@ class GlobalParticipantController extends Controller
             ->orderBy('name')
             ->paginate(20);
 
-        return view('dashboard.participantes', compact('participants', 'events'));
+        $totalParticipants = Participant::whereHas('ticket', fn ($q) => $q->whereIn('event_id', $eventIds))->count();
+        $checkedInCount    = Participant::whereHas('ticket', fn ($q) => $q->whereIn('event_id', $eventIds)->whereNotNull('checked_in_at'))->count();
+        $eventsCount       = $organizer->events()->count();
+
+        return view('dashboard.participantes', compact('participants', 'events', 'totalParticipants', 'checkedInCount', 'eventsCount'));
     }
 
     public function export(Request $request): StreamedResponse

@@ -25,7 +25,7 @@ class CollaboratorAddedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.collaborators.added',
+            view: 'emails.collaborators.added',
         );
     }
 }

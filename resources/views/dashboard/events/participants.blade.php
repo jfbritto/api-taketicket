@@ -10,23 +10,22 @@
         </div>
     </div>
 
-    <form method="GET" action="{{ route('dashboard.participants', $event) }}" class="mb-6 flex items-center gap-3">
+    <form id="ep-search-form" method="GET" action="{{ route('dashboard.participants', $event) }}" class="mb-6 flex items-center gap-3">
         <input
+            id="ep-search-input"
             type="text"
             name="search"
             value="{{ request('search') }}"
             placeholder="Buscar por nome, e-mail ou documento..."
+            autocomplete="off"
             class="rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border text-sm w-80"
         />
-        <button type="submit"
-                class="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm">
-            Buscar
-        </button>
         @if(request('search'))
             <a href="{{ route('dashboard.participants', $event) }}" class="text-sm text-gray-500 hover:underline">Limpar</a>
         @endif
     </form>
 
+    <div id="ep-results-container" style="transition:opacity 0.15s;">
     <x-card>
         @if($participants->isEmpty())
             <p class="text-gray-500">Nenhum participante encontrado.</p>
@@ -74,4 +73,38 @@
             </div>
         @endif
     </x-card>
+    </div>
+
+    @push('scripts')
+    <script>
+    (function () {
+        var form      = document.getElementById('ep-search-form');
+        var input     = document.getElementById('ep-search-input');
+        var container = document.getElementById('ep-results-container');
+        var timer;
+
+        function doSearch() {
+            var params = new URLSearchParams(new FormData(form));
+            container.style.opacity = '0.5';
+            fetch(form.action + '?' + params.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var fresh = doc.getElementById('ep-results-container');
+                if (fresh) container.innerHTML = fresh.innerHTML;
+                container.style.opacity = '1';
+                history.replaceState({}, '', form.action + '?' + params.toString());
+            })
+            .catch(function () { container.style.opacity = '1'; });
+        }
+
+        input.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(doSearch, 400);
+        });
+    })();
+    </script>
+    @endpush
 </x-layouts.dashboard>

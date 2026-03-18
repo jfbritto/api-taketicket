@@ -28,7 +28,7 @@ class CollaboratorInvitedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.collaborators.invited',
+            view: 'emails.collaborators.invited',
         );
     }
 }

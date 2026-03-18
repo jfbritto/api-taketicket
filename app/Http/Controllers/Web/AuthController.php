@@ -54,11 +54,11 @@ class AuthController extends Controller
                 return redirect()->route('staff.index');
             }
 
-            return redirect('/')->with('error', 'Sua conta não tem acesso ativo a nenhum evento.');
+            return redirect('/my-tickets');
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'E-mail ou senha incorretos.',
         ])->onlyInput('email');
     }
 
@@ -106,7 +106,7 @@ class AuthController extends Controller
             return redirect('/')->with('error', 'Seu convite foi cancelado antes de ser aceito.');
         }
 
-        return redirect()->intended('/dashboard');
+        return redirect()->intended('/my-tickets');
     }
 
     public function logout(Request $request): RedirectResponse

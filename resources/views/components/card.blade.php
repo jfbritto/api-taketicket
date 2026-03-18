@@ -1,8 +1,8 @@
-@props(['title' => null])
+@props(['title' => null, 'padding' => true])
 
-<div {{ $attributes->merge(['class' => 'bg-white rounded-lg shadow-sm border p-6']) }}>
+<div {{ $attributes->merge(['class' => 'bg-white rounded-2xl border border-gray-100 ' . ($padding ? 'p-6' : '')]) }}>
     @if($title)
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $title }}</h3>
+        <h3 class="text-sm font-semibold text-gray-800 mb-4">{{ $title }}</h3>
     @endif
     {{ $slot }}
 </div>
