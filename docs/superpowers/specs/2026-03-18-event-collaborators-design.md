@@ -6,7 +6,13 @@ Allow event organizers to invite staff members (collaborators) to perform check-
 
 ## Context
 
-The existing system has a single user type: organizers who own events. Check-in is currently done by the organizer themselves via `/dashboard/checkin`. There is no concept of staff or sub-users. The `checkins` table already records `checked_by` (user_id), so audit trails are already in place — we just need to create collaborator accounts that can trigger those records.
+The existing system has a single user type: organizers who own events. Check-in is done via `/dashboard/checkin`. There is no concept of staff or sub-users. The `checkins` table already records `checked_by` (user_id), so audit trails are in place.
+
+Relevant existing classes:
+- `App\Http\Controllers\Web\AuthController` — handles `login()` and `register()` (not `AuthenticatedSessionController` or `RegisteredUserController`)
+- `App\Services\CheckinService` — `performCheckin()` and `undoCheckin()`. Does **not** check event ownership internally; that check is done inline in `CheckinController` before calling the service.
+- `App\Http\Middleware\EnsureHasOrganizer` — redirects to `/dashboard/onboarding` if `$request->user()->organizer` is null. Needs modification to not redirect collaborator-only users there.
+- `EventPolicy::manage` — checks `$user->id === $event->organizer->user_id`. Reused for invite/revoke authorization.
 
 ---
 
@@ -17,96 +23,227 @@ The existing system has a single user type: organizers who own events. Check-in 
 | Column | Type | Notes |
 |---|---|---|
 | `id` | bigint PK | — |
-| `event_id` | FK → events | Scoped to one event |
+| `event_id` | FK → events, cascade delete | Scoped to one event |
 | `inviter_user_id` | FK → users | The organizer who sent the invite |
 | `invitee_email` | string | Email used for the invitation |
 | `user_id` | FK → users, nullable | Filled when the person accepts |
 | `status` | enum | `pending`, `active`, `revoked` |
-| `expires_at` | datetime | Copied from `event.end_date` at invite time |
+| `expires_at` | datetime | Set at invite time (see rules below) |
 | `accepted_at` | datetime, nullable | When the collaborator accepted |
 | timestamps | — | — |
 
+**`expires_at` rules (applied at invite time):**
+- If `event.end_date` is not null → `expires_at = event.end_date`
+- If `event.end_date` is null → `expires_at = event.start_date + 24 hours`
+- **Rejection condition:** if computed `expires_at < now()` → validation error: "Não é possível convidar colaboradores para um evento que já encerrou." (A multi-day event still in progress has `end_date` in the future, so the invite is allowed.)
+
 **Model: `App\Models\EventCollaborator`**
-- Relationships: `event()`, `inviter()` (→ User), `user()` (→ User, nullable)
-- Scopes: `active()` — status = active AND expires_at > now()
-- `isExpired()`: `expires_at < now()`
+- Relationships: `event()`, `inviter()` (belongsTo User via `inviter_user_id`), `user()` (belongsTo User via `user_id`, nullable)
+- Scope `active()`: `where('status', 'active')->where('expires_at', '>', now())` — used for middleware and login redirect only
+- Method `isExpired()`: `$this->expires_at < now()` — used for display logic in the organizer list
+- The organizer list query loads **all** collaborators for the event (unscoped), derives display state in the view
+
+---
+
+## CheckinService — No Modification Needed
+
+`CheckinService::performCheckin()` and `undoCheckin()` do global ticket lookups and do not check event ownership internally. Event ownership is checked **inline in the controller** before calling the service (as `CheckinController` already does).
+
+`StaffCheckinController` follows the same pattern:
+1. Look up the ticket via `TicketService` (same as now)
+2. Verify `$ticket->event_id === $event->id` — where `$event` comes from the route
+3. If mismatch → return `['status' => 'invalid']` (403 not appropriate here; ticket just doesn't belong to this event)
+4. Call `CheckinService::performCheckin()` passing the authenticated collaborator as `$user`
+
+This keeps `CheckinService` unchanged and scopes ownership via the route-bound `$event`.
+
+---
+
+## `EnsureHasOrganizer` Middleware — Modification
+
+Current behavior: redirects to `/dashboard/onboarding` when `$request->user()->organizer` is null.
+
+**Modification:** before redirecting to onboarding, check if the user has any active `EventCollaborator` records. If yes → redirect to `/staff` instead of `/dashboard/onboarding`.
+
+```php
+if (! $request->user()->organizer) {
+    $hasActiveCollaboration = EventCollaborator::where('user_id', $request->user()->id)
+        ->where('status', 'active')
+        ->where('expires_at', '>', now())
+        ->exists();
+
+    return $hasActiveCollaboration
+        ? redirect('/staff')
+        : redirect('/dashboard/onboarding');
+}
+```
+
+This prevents collaborator-only users who navigate to `/dashboard` from landing on the onboarding wizard.
 
 ---
 
 ## Invitation Flow
 
+### Signed URL mechanism
+
+No token column stored. The signed URL:
+
+```php
+URL::temporarySignedRoute('invitation.accept', now()->addDays(7), ['collaborator' => $collaborator->id])
+```
+
+`InvitationController@show` also checks `expires_at` independently — a cryptographically valid but post-event URL is still rejected.
+
+### Flow
+
 ```
 Organizer submits email
         │
+        ├── Validation fails → redirect back with errors bag (field: email)
+        │
         ├── User EXISTS with that email
-        │       → Create EventCollaborator (status: active, user_id: filled)
-        │       → Send notification email: "Você foi adicionado à equipe do evento X"
-        │       → Collaborator can log in immediately
+        │       → Create EventCollaborator (status: active, user_id: filled, accepted_at: now())
+        │       → Queue CollaboratorAddedMail
+        │       → Redirect back with success flash
         │
         └── User does NOT exist
                 → Create EventCollaborator (status: pending, user_id: null)
-                → Send invitation email with signed URL → /register?invitation={token}
-                → Person registers → system matches email → links user_id → status: active
+                → Queue CollaboratorInvitedMail with signed URL
+                → Redirect back with success flash
 ```
 
-**Signed URL:** uses Laravel's `URL::temporarySignedRoute()`, valid for 7 days.
+**`CollaboratorController@store` — execution order:**
+1. `$this->authorize('manage', $event)` — called first; aborts 403 if the authenticated user is not the event's organizer
+2. Validate the `email` field (constraints below)
+3. Create the `EventCollaborator` record and dispatch the appropriate mailable
 
-**Registration with pending invite:** the `RegisteredUserController` checks for a pending `EventCollaborator` matching the registered email and activates it automatically.
+**Invite constraints** (field error on `email`):
+- Computed `expires_at` must be > now()
+- Email must not belong to the event's organizer user
+- No existing non-revoked record for this event + email (`status IN (pending, active)`)
+- Standard `email` format validation
 
-**Constraints:**
-- Cannot invite the event's own organizer user
-- Cannot invite someone already in the team for this event
-- Invitation token expires in 7 days; after that the organizer must re-invite
+### `InvitationController@show` — GET /invitation/{collaborator}
 
-**Revocation:** organizer clicks "Remover" → status set to `revoked` → middleware blocks on next request. Available for `active` and `pending` collaborators only.
+No auth required. `signed` middleware rejects tampered/expired URLs before controller runs.
 
-**Expiration:** `expires_at` is set to `event.end_date` at invite time. No cron needed — the middleware checks `expires_at > now()` on every request.
+Controller logic:
+1. If `collaborator.expires_at < now()` → show error view: "Este convite expirou. Peça ao organizador um novo convite."
+2. If `collaborator.status = revoked` → show error view: "Este convite foi cancelado."
+3. If `collaborator.status = active`:
+   - If `auth()->check()` → redirect to `route('staff.checkin', $collaborator->event)`
+   - If not authenticated → store `route('staff.checkin', $collaborator->event)` in `session('url.intended')`, redirect to `/login`
+   - If authenticated as a **different user** (email mismatch) → show error view: "Este convite foi enviado para outro endereço de e-mail."
+4. If `collaborator.status = pending`:
+   - If authenticated as any user → show error view: "Você está logado em outra conta. Saia e acesse o link novamente para criar uma nova conta com o e-mail convidado."
+   - If not authenticated → store `$collaborator->id` in `session('pending_collaborator_id')` and `$collaborator->invitee_email` in `session('pending_collaborator_email')`, redirect to `/register`
+
+### Registration page modification (`register` Blade view)
+
+Two session keys are used throughout this flow:
+- `pending_collaborator_id` — the `EventCollaborator` primary key (integer)
+- `pending_collaborator_email` — the `invitee_email` string, used to pre-fill the email field
+
+When `session('pending_collaborator_id')` is set:
+- Show notice banner: "Você foi convidado para fazer check-in no evento [X]. Complete seu cadastro para continuar."
+- Pre-fill the email field with `session('pending_collaborator_email')` using `value="{{ session('pending_collaborator_email', old('email')) }}"`
+- Make the email field **read-only** (HTML `readonly` attribute + a hidden `<input name="email">` carrying the same value to guarantee it is submitted even with `readonly`). This prevents email mismatch.
+
+The `/register` route is behind `guest` middleware. Since pending-collaborator users arrive unauthenticated (authenticated users are blocked in step 4 above), this is not an issue.
+
+### `AuthController@register` modification
+
+After creating the user, if `session('pending_collaborator_id')` is set:
+- Load `EventCollaborator` by ID
+- Verify `status = pending` (guard: organizer may have revoked during registration)
+- Verify `strtolower($collaborator->invitee_email) === strtolower($user->email)` (defensive guard — should always match given the locked field)
+- If both pass: set `user_id = $user->id`, `status = active`, `accepted_at = now()`, clear both session keys
+- Redirect to `route('staff.checkin', $collaborator->event)`
+
+If verification fails: clear session keys, redirect to `/` with flash: "Seu convite foi cancelado antes de ser aceito."
+
+### Revocation
+
+`CollaboratorController@destroy` sets `status = revoked`.
+
+- **Active collaborators:** middleware blocks on next HTTP request. Active browser sessions are not immediately invalidated — accepted known limitation.
+- **Pending collaborators:** `InvitationController@show` checks `status` before processing, so the signed URL becomes inert.
 
 ---
 
 ## Routing
 
-### Staff routes (new group)
+### Staff routes
 
-```
-GET  /staff/events/{event}/checkin           → StaffCheckinController@index
-POST /staff/events/{event}/checkin/validate  → StaffCheckinController@validateTicket
-POST /staff/events/{event}/checkin/undo      → StaffCheckinController@undo
-GET  /staff/events/{event}/participants      → StaffParticipantController@index
-GET  /staff                                  → StaffController@index (event selector)
-```
+```php
+Route::middleware('auth')->prefix('staff')->name('staff.')->group(function () {
+    Route::get('/', [StaffController::class, 'index'])->name('index');
 
-Middleware: `auth`, `EnsureIsEventCollaborator`
+    Route::middleware('ensure.collaborator')->group(function () {
+        Route::get('events/{event}/checkin', [StaffCheckinController::class, 'index'])->name('checkin');
+        Route::post('events/{event}/checkin/validate', [StaffCheckinController::class, 'validateTicket'])->name('checkin.validate');
+        Route::post('events/{event}/checkin/undo', [StaffCheckinController::class, 'undo'])->name('checkin.undo');
+        Route::get('events/{event}/participants', [StaffParticipantController::class, 'index'])->name('participants');
+    });
+});
 
-### Organizer routes (additions to existing group)
-
-```
-POST   /dashboard/events/{event}/collaborators          → CollaboratorController@store
-DELETE /dashboard/events/{event}/collaborators/{collaborator} → CollaboratorController@destroy
+Route::middleware('signed')->get('invitation/{collaborator}', [InvitationController::class, 'show'])->name('invitation.accept');
 ```
 
-### Login redirect (modification)
+### Organizer routes (inside existing dashboard group)
 
-After login, if user has no organizer:
-- 1 active collaboration → redirect to `/staff/events/{event}/checkin`
-- N active collaborations → redirect to `/staff` (event selector page)
-- 0 active collaborations → redirect back to `/login` with error "Sua conta não tem acesso ativo."
+```php
+Route::post('events/{event}/collaborators', [CollaboratorController::class, 'store'])->name('dashboard.collaborators.store');
+Route::delete('events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'destroy'])->name('dashboard.collaborators.destroy');
+```
+
+### Login redirect — `AuthController@login` modification
+
+After `Auth::attempt()` succeeds, apply the following priority order (evaluate top to bottom, stop at first match):
+
+```
+1. session('url.intended') is set → redirect()->intended()   ← always takes priority
+2. user->organizer exists         → redirect('/dashboard')
+3. Else:
+  $collaborations = EventCollaborator::where('user_id', $user->id)
+      ->where('status', 'active')
+      ->where('expires_at', '>', now())
+      ->get();
+  count == 1 → redirect(route('staff.checkin', $collaborations->first()->event))
+  count > 1  → redirect(route('staff.index'))
+  count == 0 → redirect('/') with error flash:
+               "Sua conta não tem acesso ativo a nenhum evento."
+               [do NOT logout]
+```
 
 ---
 
-## Middleware: `EnsureIsEventCollaborator`
+## Middleware: `EnsureIsEventCollaborator` (alias `ensure.collaborator`)
 
-Applied to all `/staff/events/{event}/...` routes.
+`{event}` is resolved via route model binding (404 if not found). Retrieve the bound model using `$request->route('event')` inside `handle()` — do **not** declare it as a typed parameter on `handle()`, since Laravel does not inject route model bindings into middleware parameters automatically.
 
-Checks:
-1. User is authenticated
-2. User has an `EventCollaborator` record for the `{event}` in the route
-3. `status = active`
-4. `expires_at > now()`
+```php
+public function handle(Request $request, Closure $next): Response
+{
+    $event = $request->route('event'); // already resolved to Event model
 
-On failure:
-- Not found / revoked → 403 "Você não tem acesso a este evento."
-- Expired → 403 "Seu acesso a este evento expirou."
+    $collaborator = EventCollaborator::where('event_id', $event->id)
+        ->where('user_id', auth()->id())
+        ->latest() // most recent record wins on revoke + re-invite
+        ->first();
+
+    // ... apply checks below
+}
+```
+
+- No record, `status = revoked`, `status = pending` → abort(403, "Você não tem acesso a este evento.")
+- `status = active`, `expires_at < now()` → abort(403, "Seu acesso a este evento expirou.")
+- `status = active`, `expires_at > now()` → pass
+
+### `StaffController@index` (GET /staff — no `ensure.collaborator`)
+
+- If `auth()->user()->organizer` exists → redirect to `/dashboard`
+- Else → load active collaborations, show event selector or empty state
 
 ---
 
@@ -114,89 +251,122 @@ On failure:
 
 ### Layout: `x-layouts.staff`
 
-Minimal layout — no sidebar. Fixed top header with:
-- TakeTicket logo (links to `/staff`)
-- Event name + date
-- Logged-in user's name + logout button
+Props: `$event` (nullable — null on the event selector page).
 
-Two navigation tabs: **Check-in** | **Participantes**
+Fixed top header:
+- TakeTicket logo → `/staff`
+- If `$event` is set: event name + formatted date
+- User's first name + logout button (POST `/logout`)
 
-### Check-in tab
+Two nav tabs (only when `$event` is set): **Check-in** | **Participantes**
 
-Three stat cards at the top:
-- Total de ingressos
-- Check-ins realizados
-- Faltam
+### `/staff` — Event selector (`StaffController@index`)
 
-Below: same check-in form as the organizer (manual ticket code + QR scanner). Event is pre-selected — no event selector shown.
+Cards: event name, date, location, "Acessar Check-in →" link.
+Empty state: "Você não tem acesso ativo a nenhum evento no momento."
 
-Reuses `CheckinService` — no duplicate logic. Creates `Checkin` records with the collaborator's `user_id` as `checked_by`.
+### Check-in tab (`StaffCheckinController@index`)
 
-### Participants tab
+Stat cards:
+- Total: `$event->ticketTypes()->sum('quantity')`
+- Check-ins realizados: `$event->tickets()->where('status', 'used')->count()`
+- Faltam: total − checked-in
 
-Paginated, searchable list (by name or ticket code). Columns: name, ticket type, ticket code, status (válido / check-in feito). Read-only.
+Form: manual ticket code input + "Validar" button + QR scanner button. Event fixed from route.
 
-### Feedback
+**Undo UI:** after a `valid` response, the success toast shows participant name and a "Desfazer" link (visible for 30 seconds via Alpine.js timer, or until next scan). Clicking sends `POST .../checkin/undo`. On success: "Check-in desfeito." toast, stats refresh. Only the immediately preceding scan can be undone.
 
-Same toast behavior as the existing check-in interface: green (valid), yellow (already used), red (invalid).
+### JSON response format (StaffCheckinController)
+
+`StaffCheckinController` calls `CheckinService::performCheckin()` and transforms the result before returning JSON. The `valid` response includes `ticket_code` from the ticket model (not available directly from `Participant`):
+
+```json
+{ "status": "valid", "participant": { "name": "Ana Souza", "ticket_code": "TKT-ABCD1234" } }
+{ "status": "already_used", "checked_in_at": "2026-03-25T20:14:00" }
+{ "status": "invalid" }
+```
+
+The controller retrieves `ticket_code` by reloading the ticket from the service result: `$result['participant']->ticket->ticket_code` (the `Participant` model has a `ticket()` belongsTo relationship).
+
+### Participants tab (`StaffParticipantController@index`)
+
+Query: participants through tickets scoped to `$event->id`. Paginated (20/page). Search via `q` (LIKE on `participants.name` or `tickets.ticket_code`).
+
+Columns: Nome, Tipo de ingresso, Código, Status (verde "Check-in feito" / cinza "Válido").
+Read-only. No export.
 
 ---
 
 ## Organizer Interface — Team Management
 
-A new **"Equipe de Check-in"** section added at the bottom of the existing event show page (`dashboard/events/show.blade.php`).
+New section at bottom of `dashboard/events/show.blade.php`.
 
-### Collaborator list
+`DashboardEventController@show` adds: `$collaborators = $event->collaborators()->with('user')->latest()->get()`
 
-Each row shows: name (if accepted) or email (if pending), status badge, remove button.
+### List
 
-Status badges:
+Each row: name (if `user` loaded) or `invitee_email`, status badge, remove button.
+
+Status badge (derived in view):
 - `pending` → gray "Aguardando cadastro"
-- `active` → green "Ativo"
-- `revoked` → muted, no action button
-- expired (active but `expires_at < now()`) → gray "Expirado"
+- `active` + `isExpired()` → gray "Expirado"
+- `active` + not expired → green "Ativo"
+- `revoked` → muted "Revogado", no button
+
+Remove button: shown for `active` (not expired) and `pending` only.
 
 ### Invite form
 
-Inline form below the list — email input + "Convidar" button. No modal, no separate page. On success, the list refreshes and shows the new collaborator.
+Inline form. Error: `$errors->get('email')` shown below input, field stays populated (`old('email')`).
 
-### Revoke
+### Revoke (`CollaboratorController@destroy`)
 
-"Remover" button (✕) on active and pending rows only. Instant — no confirmation modal (low-stakes action, easily re-invited).
-
----
-
-## Email Notifications
-
-### Mailable: `CollaboratorInvited`
-
-Sent when inviting a non-existing user. Contains:
-- Event name, date, location
-- Organizer name
-- CTA button → signed `/register?invitation={token}` URL
-- Expiry note: "Este convite expira em 7 dias."
-
-### Notification: `CollaboratorAdded` (existing user)
-
-Sent when inviting an existing user. Simple notification:
-- "Você foi adicionado à equipe de check-in do evento X."
-- CTA button → `/staff/events/{event}/checkin`
+- `$this->authorize('manage', $event)` (EventPolicy::manage)
+- Verify `$collaborator->event_id === $event->id`
+- Set `status = revoked`
+- Redirect back with flash: "Acesso de [$name/$email] revogado."
 
 ---
 
-## Authorization
+## Mailables
 
-- Only the event's organizer can invite or revoke collaborators (`EventPolicy::manage`)
-- Collaborators cannot invite other collaborators
-- Collaborators have read-only access to participants (no export, no edit)
-- Each check-in action is attributed to the collaborator's own user_id
+Both `Mailable`, both `ShouldQueue`.
+
+### `CollaboratorInvitedMail` (new user)
+- Organizer name, event name/date/location
+- CTA "Aceitar convite" → signed URL
+- "Este convite expira em 7 dias."
+
+### `CollaboratorAddedMail` (existing user)
+- "Você foi adicionado à equipe de check-in do evento [X]."
+- CTA "Acessar check-in" → `route('staff.checkin', $event)`
 
 ---
 
-## Out of Scope (this iteration)
+## Authorization Summary
 
-- Per-event permission levels (e.g., view-only vs. can-validate)
+| Action | Actor | Mechanism |
+|---|---|---|
+| Invite collaborator | Organizer | `EventPolicy::manage` in `CollaboratorController@store` |
+| Revoke collaborator | Organizer | `EventPolicy::manage` + `collaborator->event_id` check |
+| Access staff routes | Collaborator | `EnsureIsEventCollaborator` middleware |
+| Validate ticket | Collaborator | Middleware + inline `$ticket->event_id === $event->id` check + `CheckinService` |
+| Undo check-in | Collaborator | Middleware + inline event check + `CheckinService::undoCheckin()` |
+| View participants | Collaborator | Middleware (read-only) |
+
+---
+
+## Known Limitations
+
+- Active sessions not invalidated on revocation — middleware blocks on next request
+- No re-send invitation UI — organizer revokes and re-invites
+- No offline/PWA support
+
+---
+
+## Out of Scope
+
+- Per-event permission levels
 - Collaborator access to financial data
-- Collaborator notifications when check-in stats change
-- Re-sending invitations (organizer can revoke and re-invite)
-- Mobile-specific PWA or offline mode
+- In-app notifications
+- Mobile PWA / offline mode
