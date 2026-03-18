@@ -41,9 +41,6 @@ jobs:
             php8.4 artisan view:cache
             php8.4 artisan event:cache
 
-            echo "🔐  Fixing permissions..."
-            chmod -R 775 storage bootstrap/cache
-
             echo "🔄  Restarting queue worker..."
             supervisorctl restart taketicket-worker:*
 
