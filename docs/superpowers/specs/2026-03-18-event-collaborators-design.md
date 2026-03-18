@@ -49,11 +49,14 @@ Relevant existing classes:
 
 `CheckinService::performCheckin()` and `undoCheckin()` do global ticket lookups and do not check event ownership internally. Event ownership is checked **inline in the controller** before calling the service (as `CheckinController` already does).
 
+`TicketService::validateTicket(string $ticketCode)` and `TicketService::validateQrPayload(string $payload)` both return `?Ticket` (an Eloquent `Ticket` model instance, or `null` if not found/invalid). This is the `$ticket` variable used in steps below.
+
 `StaffCheckinController` follows the same pattern:
-1. Look up the ticket via `TicketService` (same as now)
-2. Verify `$ticket->event_id === $event->id` — where `$event` comes from the route
-3. If mismatch → return `['status' => 'invalid']` (403 not appropriate here; ticket just doesn't belong to this event)
+1. Look up the ticket: `$ticket = $isQrPayload ? $ticketService->validateQrPayload($input) : $ticketService->validateTicket($input)` — returns `?Ticket`
+2. If `$ticket` is null → return `['status' => 'invalid']`
+3. Verify `$ticket->event_id === $event->id` — where `$event` comes from the route; if mismatch → return `['status' => 'invalid']`
 4. Call `CheckinService::performCheckin()` passing the authenticated collaborator as `$user`
+5. On `valid` result: build the JSON response using `$ticket->ticket_code` (the same `$ticket` Eloquent instance from step 1 — no re-fetch needed) and `$result['participant']->name`
 
 This keeps `CheckinService` unchanged and scopes ownership via the route-bound `$event`.
 
