@@ -29,7 +29,13 @@ class EventCollaboratorFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(['status' => 'active', 'accepted_at' => now()]);
+        return $this->state(function (array $attributes) {
+            return [
+                'user_id' => \App\Models\User::factory(),
+                'status' => 'active',
+                'accepted_at' => now(),
+            ];
+        });
     }
 
     public function revoked(): static
