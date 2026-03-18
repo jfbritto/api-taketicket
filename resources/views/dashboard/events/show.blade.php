@@ -252,6 +252,92 @@
             </div>
         </div>
 
+        {{-- Equipe de Check-in --}}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-gray-800">Equipe de Check-in</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Colaboradores autorizados a realizar check-in neste evento.</p>
+                </div>
+            </div>
+
+            {{-- Invite form --}}
+            <div class="px-6 py-4 border-b border-gray-100">
+                @if(session('success'))
+                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+                        <p style="font-size:13px;color:#16a34a;margin:0;font-weight:500;">{{ session('success') }}</p>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('dashboard.collaborators.store', $event) }}" style="display:flex;gap:8px;align-items:flex-start;">
+                    @csrf
+                    <div style="flex:1;">
+                        <input type="email" name="email" value="{{ old('email') }}"
+                               placeholder="email@colaborador.com"
+                               style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid {{ $errors->has('email') ? '#fca5a5' : '#e5e7eb' }};border-radius:8px;font-size:14px;font-family:inherit;outline:none;">
+                        @error('email')
+                            <p style="font-size:12px;color:#dc2626;margin:4px 0 0 0;">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <button type="submit"
+                            style="padding:10px 20px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;">
+                        Convidar
+                    </button>
+                </form>
+            </div>
+
+            {{-- Collaborator list --}}
+            @if($collaborators->isEmpty())
+                <div style="text-align:center;padding:40px;">
+                    <p style="color:#9ca3af;font-size:14px;margin:0;">Nenhum colaborador adicionado ainda.</p>
+                </div>
+            @else
+                <div class="divide-y divide-gray-50">
+                    @foreach($collaborators as $collaborator)
+                        @php
+                            $displayName = $collaborator->user?->name ?? $collaborator->invitee_email;
+                            $isRevoked = $collaborator->status === 'revoked';
+                            $isExpired = $collaborator->status === 'active' && $collaborator->isExpired();
+                            $isActive = $collaborator->status === 'active' && ! $collaborator->isExpired();
+                            $isPending = $collaborator->status === 'pending';
+                            $showButton = $isActive || $isPending;
+                        @endphp
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 24px;">
+                            <div>
+                                <p style="font-size:14px;font-weight:600;color:#111827;margin:0;">{{ $displayName }}</p>
+                                @if($collaborator->user && $collaborator->user->email !== $collaborator->invitee_email)
+                                    <p style="font-size:12px;color:#9ca3af;margin:2px 0 0 0;">{{ $collaborator->invitee_email }}</p>
+                                @endif
+                            </div>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                @if($isActive)
+                                    <span style="background:#dcfce7;color:#16a34a;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">Ativo</span>
+                                @elseif($isPending)
+                                    <span style="background:#f3f4f6;color:#6b7280;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">Aguardando cadastro</span>
+                                @elseif($isExpired)
+                                    <span style="background:#f3f4f6;color:#9ca3af;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">Expirado</span>
+                                @elseif($isRevoked)
+                                    <span style="background:#f3f4f6;color:#d1d5db;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">Revogado</span>
+                                @endif
+
+                                @if($showButton)
+                                    <form method="POST" action="{{ route('dashboard.collaborators.destroy', [$event, $collaborator]) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                style="font-size:12px;color:#dc2626;background:none;border:1px solid #fecaca;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;"
+                                                onclick="return confirm('Remover acesso de {{ $displayName }}?')">
+                                            Remover
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
     </div>
 
     @push('scripts')

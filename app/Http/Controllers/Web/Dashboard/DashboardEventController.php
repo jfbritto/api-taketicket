@@ -70,6 +70,8 @@ class DashboardEventController extends Controller
             ->take(5)
             ->get();
 
+        $collaborators = $event->collaborators()->with('user')->latest()->get();
+
         return view('dashboard.events.show', compact(
             'event',
             'ticketTypes',
@@ -77,7 +79,8 @@ class DashboardEventController extends Controller
             'totalRevenue',
             'totalCheckins',
             'totalCapacity',
-            'recentOrders'
+            'recentOrders',
+            'collaborators'
         ));
     }
 

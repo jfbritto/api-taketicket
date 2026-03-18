@@ -500,4 +500,39 @@ class EventCollaboratorTest extends TestCase
         $response->assertOk();
         $response->assertSee($event->title);
     }
+
+    public function test_event_show_page_displays_collaborators_section(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+
+        $user = User::factory()->create(['name' => 'Maria Staff', 'email' => 'maria@example.com']);
+        EventCollaborator::factory()->create([
+            'event_id' => $event->id,
+            'inviter_user_id' => $organizer->user_id,
+            'invitee_email' => 'maria@example.com',
+            'user_id' => $user->id,
+            'status' => 'active',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->actingAs($organizer->user)
+            ->get(route('dashboard.events.show', $event));
+
+        $response->assertOk();
+        $response->assertSee('Equipe de Check-in');
+        $response->assertSee('Maria Staff');
+    }
+
+    public function test_register_page_shows_banner_with_pending_collaborator_session(): void
+    {
+        $response = $this->withSession([
+            'pending_collaborator_id' => 1,
+            'pending_collaborator_email' => 'staff@example.com',
+        ])->get('/register');
+
+        $response->assertOk();
+        $response->assertSee('convidado');
+        $response->assertSee('staff@example.com');
+    }
 }
