@@ -472,4 +472,32 @@ class EventCollaboratorTest extends TestCase
 
         $response->assertRedirect('/dashboard');
     }
+
+    public function test_staff_index_redirects_organizer_to_dashboard(): void
+    {
+        $organizer = Organizer::factory()->create();
+
+        $response = $this->actingAs($organizer->user)->get('/staff');
+
+        $response->assertRedirect('/dashboard');
+    }
+
+    public function test_staff_index_shows_active_events_for_collaborator(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        $user = User::factory()->create();
+
+        EventCollaborator::factory()->create([
+            'event_id' => $event->id,
+            'user_id' => $user->id,
+            'status' => 'active',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->actingAs($user)->get('/staff');
+
+        $response->assertOk();
+        $response->assertSee($event->title);
+    }
 }
