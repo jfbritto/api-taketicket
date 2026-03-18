@@ -26,8 +26,7 @@ class FinancialController extends Controller
         $recentOrders = (clone $paidOrders)
             ->with(['user', 'event'])
             ->latest('updated_at')
-            ->limit(15)
-            ->get();
+            ->paginate(20);
 
         return view('dashboard.financeiro', compact(
             'totalGross', 'totalFee', 'totalNet', 'totalPaidCount', 'recentOrders'

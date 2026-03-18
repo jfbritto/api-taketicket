@@ -54,9 +54,11 @@
 
     {{-- Recent Paid Orders --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="font-bold text-gray-800">Histórico de Recebimentos</h3>
-            <p class="text-sm text-gray-500 mt-0.5">Últimos 15 pedidos pagos</p>
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+                <h3 class="font-bold text-gray-800">Histórico de Recebimentos</h3>
+                <p class="text-sm text-gray-500 mt-0.5">{{ $recentOrders->total() }} pedido{{ $recentOrders->total() !== 1 ? 's' : '' }} pagos</p>
+            </div>
         </div>
 
         @if($recentOrders->isEmpty())
@@ -98,6 +100,12 @@
                     </tbody>
                 </table>
             </div>
+
+            @if($recentOrders->hasPages())
+                <div class="px-6 py-4 border-t border-gray-100">
+                    {{ $recentOrders->withQueryString()->links() }}
+                </div>
+            @endif
         @endif
     </div>
 
