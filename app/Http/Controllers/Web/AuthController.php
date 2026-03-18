@@ -27,7 +27,34 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            $user = Auth::user();
+
+            // Priority 1: intended URL (e.g. set by invitation flow)
+            if ($request->session()->has('url.intended')) {
+                return redirect()->intended();
+            }
+
+            // Priority 2: organizer
+            if ($user->organizer) {
+                return redirect('/dashboard');
+            }
+
+            // Priority 3: collaborations
+            $collaborations = \App\Models\EventCollaborator::where('user_id', $user->id)
+                ->where('status', 'active')
+                ->where('expires_at', '>', now())
+                ->with('event')
+                ->get();
+
+            if ($collaborations->count() === 1) {
+                return redirect()->route('staff.checkin', $collaborations->first()->event);
+            }
+
+            if ($collaborations->count() > 1) {
+                return redirect()->route('staff.index');
+            }
+
+            return redirect('/')->with('error', 'Sua conta não tem acesso ativo a nenhum evento.');
         }
 
         return back()->withErrors([
@@ -55,6 +82,29 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        // Activate pending collaborator invite if present
+        if ($request->session()->has('pending_collaborator_id')) {
+            $collaboratorId = $request->session()->pull('pending_collaborator_id');
+            $request->session()->forget('pending_collaborator_email');
+
+            $collaborator = \App\Models\EventCollaborator::find($collaboratorId);
+
+            if ($collaborator
+                && $collaborator->status === 'pending'
+                && strtolower($collaborator->invitee_email) === strtolower($user->email)
+            ) {
+                $collaborator->update([
+                    'user_id' => $user->id,
+                    'status' => 'active',
+                    'accepted_at' => now(),
+                ]);
+
+                return redirect()->route('staff.checkin', $collaborator->event);
+            }
+
+            return redirect('/')->with('error', 'Seu convite foi cancelado antes de ser aceito.');
+        }
 
         return redirect()->intended('/dashboard');
     }

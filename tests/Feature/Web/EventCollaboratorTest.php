@@ -335,4 +335,141 @@ class EventCollaboratorTest extends TestCase
             'status' => 'revoked',
         ]);
     }
+
+    public function test_login_redirects_organizer_to_dashboard(): void
+    {
+        $organizer = Organizer::factory()->create();
+
+        $response = $this->post('/login', [
+            'email' => $organizer->user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect('/dashboard');
+    }
+
+    public function test_login_redirects_single_collaborator_to_staff_checkin(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        $user = User::factory()->create(['password' => \Illuminate\Support\Facades\Hash::make('password')]);
+
+        EventCollaborator::factory()->create([
+            'event_id' => $event->id,
+            'inviter_user_id' => $organizer->user_id,
+            'user_id' => $user->id,
+            'status' => 'active',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('staff.checkin', $event));
+    }
+
+    public function test_login_redirects_multiple_collaborations_to_staff_index(): void
+    {
+        $user = User::factory()->create(['password' => \Illuminate\Support\Facades\Hash::make('password')]);
+
+        foreach (range(1, 2) as $_) {
+            $organizer = Organizer::factory()->create();
+            $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+            EventCollaborator::factory()->create([
+                'event_id' => $event->id,
+                'inviter_user_id' => $organizer->user_id,
+                'user_id' => $user->id,
+                'status' => 'active',
+                'expires_at' => now()->addDay(),
+            ]);
+        }
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('staff.index'));
+    }
+
+    public function test_login_with_no_access_redirects_home_with_error(): void
+    {
+        $user = User::factory()->create(['password' => \Illuminate\Support\Facades\Hash::make('password')]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect('/');
+        $this->assertAuthenticated(); // user stays logged in
+    }
+
+    public function test_login_respects_url_intended(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        $user = User::factory()->create(['password' => \Illuminate\Support\Facades\Hash::make('password')]);
+
+        EventCollaborator::factory()->create([
+            'event_id' => $event->id,
+            'inviter_user_id' => $organizer->user_id,
+            'user_id' => $user->id,
+            'status' => 'active',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $intendedUrl = route('staff.checkin', $event);
+
+        $response = $this->withSession(['url.intended' => $intendedUrl])
+            ->post('/login', [
+                'email' => $user->email,
+                'password' => 'password',
+            ]);
+
+        $response->assertRedirect($intendedUrl);
+    }
+
+    public function test_register_activates_pending_collaborator(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        $collaborator = EventCollaborator::factory()->create([
+            'event_id' => $event->id,
+            'inviter_user_id' => $organizer->user_id,
+            'invitee_email' => 'newstaff@example.com',
+            'status' => 'pending',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->withSession([
+            'pending_collaborator_id' => $collaborator->id,
+            'pending_collaborator_email' => 'newstaff@example.com',
+        ])->post('/register', [
+            'name' => 'New Staff',
+            'email' => 'newstaff@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertRedirect(route('staff.checkin', $event));
+        $this->assertDatabaseHas('event_collaborators', [
+            'id' => $collaborator->id,
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_register_without_pending_collaborator_goes_to_dashboard(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'New User',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertRedirect('/dashboard');
+    }
 }
