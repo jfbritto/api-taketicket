@@ -19,7 +19,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            whoami && id
             git config --global --add safe.directory /var/www/taketicket
             cd /var/www/taketicket
 
