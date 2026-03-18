@@ -3,6 +3,7 @@
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\CheckoutController;
 use App\Http\Controllers\Web\Dashboard\CheckinController;
+use App\Http\Controllers\Web\Dashboard\CollaboratorController;
 use App\Http\Controllers\Web\Dashboard\DashboardController;
 use App\Http\Controllers\Web\Dashboard\FinancialController;
 use App\Http\Controllers\Web\Dashboard\DashboardEventController;
@@ -12,8 +13,12 @@ use App\Http\Controllers\Web\Dashboard\ParticipantController;
 use App\Http\Controllers\Web\Dashboard\SettingsController;
 use App\Http\Controllers\Web\Dashboard\TicketController as DashboardTicketController;
 use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Web\InvitationController;
 use App\Http\Controllers\Web\MyTicketsController;
 use App\Http\Controllers\Web\PublicEventController;
+use App\Http\Controllers\Web\Staff\StaffController;
+use App\Http\Controllers\Web\Staff\StaffCheckinController;
+use App\Http\Controllers\Web\Staff\StaffParticipantController;
 use App\Http\Middleware\EnsureHasOrganizer;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +49,18 @@ Route::middleware('auth')->group(function () {
     Route::get('checkout/{order}/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
     Route::post('checkout/{order}/payment', [CheckoutController::class, 'processPayment'])->name('checkout.processPayment');
     Route::get('checkout/{order}/status', [CheckoutController::class, 'status'])->name('checkout.status');
+
+    // Staff routes
+    Route::prefix('staff')->name('staff.')->group(function () {
+        Route::get('/', [StaffController::class, 'index'])->name('index');
+
+        Route::middleware('ensure.collaborator')->group(function () {
+            Route::get('events/{event}/checkin', [StaffCheckinController::class, 'index'])->name('checkin');
+            Route::post('events/{event}/checkin/validate', [StaffCheckinController::class, 'validateTicket'])->name('checkin.validate');
+            Route::post('events/{event}/checkin/undo', [StaffCheckinController::class, 'undo'])->name('checkin.undo');
+            Route::get('events/{event}/participants', [StaffParticipantController::class, 'index'])->name('participants');
+        });
+    });
 
     // Dashboard onboarding (auth but NO organizer middleware)
     Route::get('dashboard/onboarding', [DashboardController::class, 'onboarding'])->name('dashboard.onboarding');
@@ -85,5 +102,11 @@ Route::middleware('auth')->group(function () {
         Route::get('settings', [SettingsController::class, 'index'])->name('dashboard.settings');
         Route::put('settings/organizer', [SettingsController::class, 'updateOrganizer'])->name('dashboard.settings.organizer');
         Route::put('settings/password', [SettingsController::class, 'updatePassword'])->name('dashboard.settings.password');
+
+        // Collaborators
+        Route::post('events/{event}/collaborators', [CollaboratorController::class, 'store'])->name('dashboard.collaborators.store');
+        Route::delete('events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'destroy'])->name('dashboard.collaborators.destroy');
     });
 });
+
+Route::middleware('signed')->get('invitation/{collaborator}', [InvitationController::class, 'show'])->name('invitation.accept');
