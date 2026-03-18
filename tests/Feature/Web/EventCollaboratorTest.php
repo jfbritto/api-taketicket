@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Web;
 
+use App\Mail\CollaboratorAddedMail;
+use App\Mail\CollaboratorInvitedMail;
 use App\Models\Event;
 use App\Models\EventCollaborator;
 use App\Models\Organizer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class EventCollaboratorTest extends TestCase
@@ -184,5 +187,152 @@ class EventCollaboratorTest extends TestCase
         $response = $this->actingAs($user)->get("/staff/events/{$event->id}/checkin");
 
         $response->assertForbidden();
+    }
+
+    public function test_organizer_can_invite_new_user_as_pending(): void
+    {
+        Mail::fake();
+
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create([
+            'organizer_id' => $organizer->id,
+            'start_date' => now()->addDays(7),
+            'end_date' => now()->addDays(8),
+        ]);
+
+        $response = $this->actingAs($organizer->user)
+            ->post(route('dashboard.collaborators.store', $event), [
+                'email' => 'staff@example.com',
+            ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('event_collaborators', [
+            'event_id' => $event->id,
+            'invitee_email' => 'staff@example.com',
+            'status' => 'pending',
+        ]);
+        Mail::assertQueued(CollaboratorInvitedMail::class);
+    }
+
+    public function test_organizer_can_invite_existing_user_as_active(): void
+    {
+        Mail::fake();
+
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create([
+            'organizer_id' => $organizer->id,
+            'start_date' => now()->addDays(7),
+            'end_date' => now()->addDays(8),
+        ]);
+        $existingUser = User::factory()->create(['email' => 'existing@example.com']);
+
+        $response = $this->actingAs($organizer->user)
+            ->post(route('dashboard.collaborators.store', $event), [
+                'email' => 'existing@example.com',
+            ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('event_collaborators', [
+            'event_id' => $event->id,
+            'invitee_email' => 'existing@example.com',
+            'user_id' => $existingUser->id,
+            'status' => 'active',
+        ]);
+        Mail::assertQueued(CollaboratorAddedMail::class);
+    }
+
+    public function test_cannot_invite_to_past_event(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create([
+            'organizer_id' => $organizer->id,
+            'start_date' => now()->subDays(2),
+            'end_date' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($organizer->user)
+            ->post(route('dashboard.collaborators.store', $event), [
+                'email' => 'staff@example.com',
+            ]);
+
+        $response->assertSessionHasErrors('email');
+        $this->assertDatabaseMissing('event_collaborators', ['event_id' => $event->id]);
+    }
+
+    public function test_cannot_invite_organizers_own_email(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create([
+            'organizer_id' => $organizer->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+        ]);
+
+        $response = $this->actingAs($organizer->user)
+            ->post(route('dashboard.collaborators.store', $event), [
+                'email' => $organizer->user->email,
+            ]);
+
+        $response->assertSessionHasErrors('email');
+    }
+
+    public function test_cannot_invite_already_invited_email(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create([
+            'organizer_id' => $organizer->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+        ]);
+
+        EventCollaborator::factory()->create([
+            'event_id' => $event->id,
+            'inviter_user_id' => $organizer->user_id,
+            'invitee_email' => 'staff@example.com',
+            'status' => 'pending',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->actingAs($organizer->user)
+            ->post(route('dashboard.collaborators.store', $event), [
+                'email' => 'staff@example.com',
+            ]);
+
+        $response->assertSessionHasErrors('email');
+    }
+
+    public function test_non_organizer_cannot_invite(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        $otherOrganizer = Organizer::factory()->create();
+
+        $response = $this->actingAs($otherOrganizer->user)
+            ->post(route('dashboard.collaborators.store', $event), [
+                'email' => 'staff@example.com',
+            ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_organizer_can_revoke_collaborator(): void
+    {
+        $organizer = Organizer::factory()->create();
+        $event = Event::factory()->create(['organizer_id' => $organizer->id]);
+        $collaborator = EventCollaborator::factory()->create([
+            'event_id' => $event->id,
+            'inviter_user_id' => $organizer->user_id,
+            'status' => 'active',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->actingAs($organizer->user)
+            ->delete(route('dashboard.collaborators.destroy', [$event, $collaborator]));
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('event_collaborators', [
+            'id' => $collaborator->id,
+            'status' => 'revoked',
+        ]);
     }
 }
