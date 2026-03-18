@@ -42,7 +42,6 @@ jobs:
             php8.4 artisan event:cache
 
             echo "🔐  Fixing permissions..."
-            chown -R www-data:www-data storage bootstrap/cache
             chmod -R 775 storage bootstrap/cache
 
             echo "🔄  Restarting queue worker..."
