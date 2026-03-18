@@ -20,8 +20,6 @@ jobs:
           script: |
             set -e
             git config --global --add safe.directory /var/www/taketicket
-            chown -R root:root /var/www/taketicket/.git
-            chmod -R u+w /var/www/taketicket/.git
             cd /var/www/taketicket
 
             echo "⬇️  Pulling latest code..."
