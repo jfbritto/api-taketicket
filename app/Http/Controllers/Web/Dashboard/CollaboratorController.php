@@ -37,7 +37,7 @@ class CollaboratorController extends Controller
                     }
 
                     $exists = EventCollaborator::where('event_id', $event->id)
-                        ->where('invitee_email', $value)
+                        ->whereRaw('LOWER(invitee_email) = ?', [strtolower($value)])
                         ->whereIn('status', ['pending', 'active'])
                         ->exists();
 

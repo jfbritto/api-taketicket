@@ -22,7 +22,7 @@ class EnsureIsEventCollaborator
             abort(403, 'Você não tem acesso a este evento.');
         }
 
-        if ($collaborator->expires_at !== null && $collaborator->expires_at < now()) {
+        if ($collaborator->expires_at < now()) {
             abort(403, 'Seu acesso a este evento expirou.');
         }
 
