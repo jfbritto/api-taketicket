@@ -17,4 +17,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /home/deploy/deploy.sh
+          script: /home/deploy/deploy-taketicket.sh
