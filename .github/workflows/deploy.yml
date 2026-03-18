@@ -23,7 +23,8 @@ jobs:
             cd /var/www/taketicket
 
             echo "⬇️  Pulling latest code..."
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
 
             echo "📦  Installing PHP dependencies..."
             php8.4 /usr/local/bin/composer install --no-dev --optimize-autoloader
