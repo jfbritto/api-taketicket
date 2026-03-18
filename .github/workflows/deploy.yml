@@ -1,0 +1,49 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /var/www/taketicket
+
+            echo "⬇️  Pulling latest code..."
+            git pull origin main
+
+            echo "📦  Installing PHP dependencies..."
+            php8.4 /usr/local/bin/composer install --no-dev --optimize-autoloader
+
+            echo "🎨  Building assets..."
+            npm ci && npm run build && rm -rf node_modules
+
+            echo "🗄️  Running migrations..."
+            php8.4 artisan migrate --force
+
+            echo "⚡  Caching config/routes/views..."
+            php8.4 artisan config:cache
+            php8.4 artisan route:cache
+            php8.4 artisan view:cache
+            php8.4 artisan event:cache
+
+            echo "🔐  Fixing permissions..."
+            chown -R www-data:www-data storage bootstrap/cache
+            chmod -R 775 storage bootstrap/cache
+
+            echo "🔄  Restarting queue worker..."
+            supervisorctl restart taketicket-worker:*
+
+            echo "✅  Deploy concluído!"
