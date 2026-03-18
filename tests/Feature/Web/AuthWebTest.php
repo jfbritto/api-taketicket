@@ -40,7 +40,8 @@ class AuthWebTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect('/');
+        $response->assertSessionHas('error', 'Sua conta não tem acesso ativo a nenhum evento.');
         $this->assertAuthenticatedAs($user);
     }
 
