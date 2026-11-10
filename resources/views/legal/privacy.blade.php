@@ -82,7 +82,7 @@
                 <li>Revogar o consentimento a qualquer momento;</li>
                 <li>Solicitar a portabilidade dos seus dados.</li>
             </ul>
-            <p style="margin:12px 0 0;">Para exercer seus direitos, entre em contato pelo e-mail <a href="mailto:contato@helpflux.com.br" style="color:#4f46e5;font-weight:600;">contato@helpflux.com.br</a>.</p>
+            <p style="margin:12px 0 0;">Para exercer seus direitos, entre em contato pelo e-mail <a href="mailto:privacidade@helpflux.com.br" style="color:#4f46e5;font-weight:600;">privacidade@helpflux.com.br</a>.</p>
         </section>
 
         <div style="border-top:1px solid #f1f5f9;margin-bottom:36px;"></div>
@@ -98,7 +98,7 @@
             <h2 style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 14px;">8. Contato e Encarregado (DPO)</h2>
             <p style="margin:0;">Para questões relacionadas à privacidade e proteção de dados, entre em contato:<br>
             <strong style="color:#1e293b;">HELPFLUX SOLUÇÕES EM TECNOLOGIA LTDA</strong><br>
-            <a href="mailto:helpflux.atendimento@gmail.com" style="color:#4f46e5;font-weight:600;">helpflux.atendimento@gmail.com</a><br>
+            <a href="mailto:privacidade@helpflux.com.br" style="color:#4f46e5;font-weight:600;">privacidade@helpflux.com.br</a><br>
             <a href="tel:+5528999743099" style="color:#4f46e5;font-weight:600;">(28) 99974-3099</a><br>
             <a href="https://helpflux.com.br/" target="_blank" rel="noopener" style="color:#4f46e5;font-weight:600;">helpflux.com.br</a><br>
             Santa Maria de Jetibá – ES</p>
