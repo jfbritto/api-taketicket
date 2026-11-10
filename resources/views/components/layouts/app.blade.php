@@ -182,13 +182,13 @@
                 <p style="font-size:13px;color:rgba(148,163,184,0.7);margin:0 0 4px;">CNPJ: 58.063.432/0001-21</p>
                 <p style="font-size:13px;color:rgba(148,163,184,0.7);margin:0 0 20px;">Santa Maria de Jetibá – ES</p>
                 <div style="display:flex;flex-direction:column;gap:8px;">
-                    <a href="mailto:helpflux.atendimento@gmail.com"
+                    <a href="mailto:suporte@helpflux.com.br"
                        style="font-size:13px;color:rgba(148,163,184,0.7);text-decoration:none;display:inline-flex;align-items:center;gap:6px;"
                        onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(148,163,184,0.7)'">
                         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        helpflux.atendimento@gmail.com
+                        suporte@helpflux.com.br
                     </a>
                     <a href="tel:+5528999743099"
                        style="font-size:13px;color:rgba(148,163,184,0.7);text-decoration:none;display:inline-flex;align-items:center;gap:6px;"

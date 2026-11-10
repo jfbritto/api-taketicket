@@ -76,7 +76,7 @@
         <section>
             <h2 style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 14px;">9. Contato</h2>
             <p style="margin:0 0 8px;">Dúvidas sobre estes termos podem ser enviadas para:</p>
-            <p style="margin:0;"><a href="mailto:helpflux.atendimento@gmail.com" style="color:#4f46e5;font-weight:600;">helpflux.atendimento@gmail.com</a><br>
+            <p style="margin:0;"><a href="mailto:suporte@helpflux.com.br" style="color:#4f46e5;font-weight:600;">suporte@helpflux.com.br</a><br>
             <a href="tel:+5528999743099" style="color:#4f46e5;font-weight:600;">(28) 99974-3099</a><br>
             <a href="https://helpflux.com.br/" target="_blank" rel="noopener" style="color:#4f46e5;font-weight:600;">helpflux.com.br</a></p>
         </section>
